@@ -2,12 +2,12 @@ package net.swofty.type.skyblockgeneric.mission.missions.thepark.spruce;
 
 import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.item.Material;
+import net.swofty.commons.skyblock.item.ItemType;
 import net.swofty.type.generic.event.EventNodes;
 import net.swofty.type.generic.event.HypixelEvent;
-import net.swofty.type.skyblockgeneric.event.custom.CustomBlockBreakEvent;
 import net.swofty.type.skyblockgeneric.item.SkyBlockItem;
+import net.swofty.type.skyblockgeneric.data.SkyBlockDataHandler;
 import net.swofty.type.skyblockgeneric.mission.MissionData;
-import net.swofty.type.skyblockgeneric.mission.SkyBlockMission;
 import net.swofty.type.skyblockgeneric.mission.SkyBlockProgressMission;
 import net.swofty.type.skyblockgeneric.region.RegionType;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
@@ -21,9 +21,15 @@ public class MissionCollectSpruceLogs extends SkyBlockProgressMission {
 
 	private final Map<UUID, Long> testTimes = new HashMap<>();
 
-	@HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+	@HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = true)
 	public void onTick(PlayerTickEvent event) {
 		SkyBlockPlayer player = (SkyBlockPlayer) event.getPlayer();
+
+		// Check if SkyBlock data is loaded before accessing it
+		if (SkyBlockDataHandler.getUser(player) == null) {
+			return;
+		}
+
 		if (testTimes.containsKey(player.getUuid())) {
 			long lastTime = testTimes.get(player.getUuid());
 			if (System.currentTimeMillis() - lastTime < 650) {
@@ -47,11 +53,9 @@ public class MissionCollectSpruceLogs extends SkyBlockProgressMission {
 			}
 		}
 
-		for (SkyBlockItem item : player.getAllSacks()) {
-			if (item.getMaterial() == Material.SPRUCE_LOG || item.getMaterial() == Material.SPRUCE_WOOD) {
-				amount += item.getAmount();
-			}
-		}
+		// Add items stored in sacks
+		amount += player.getSackItems().getAmount(ItemType.SPRUCE_LOG);
+		amount += player.getSackItems().getAmount(ItemType.SPRUCE_WOOD);
 
 		MissionData.ActiveMission mission = data.getMission(this.getClass()).getKey();
 		mission.setMissionProgress(amount);

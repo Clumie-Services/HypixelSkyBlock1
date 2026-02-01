@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class MissionCraftWoodenPickaxe extends SkyBlockMission {
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onCraftEvent(ItemCraftEvent event) {
         MissionData data = event.getPlayer().getMissionData();
 

@@ -20,7 +20,7 @@ public class GameCountCache {
      * Get the player count for a specific server type and game type.
      * Returns cached value if fresh, otherwise triggers async refresh and returns stale/0.
      *
-     * @param type The server type (e.g., MURDER_MYSTERY_GAME, BEDWARS_GAME)
+     * @param type The server type
      * @param gameTypeName The game mode name (e.g., "CLASSIC", "SOLO"), or null for all modes
      * @return The player count (may be stale during refresh)
      */
@@ -31,7 +31,7 @@ public class GameCountCache {
     /**
      * Get the player count for a specific server type, game type, and map.
      *
-     * @param type The server type (e.g., MURDER_MYSTERY_GAME, BEDWARS_GAME)
+     * @param type The server type
      * @param gameTypeName The game mode name (e.g., "CLASSIC", "SOLO"), or null for all modes
      * @param mapName The map name, or null for all maps
      * @return The player count (may be stale during refresh)

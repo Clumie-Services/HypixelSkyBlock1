@@ -177,11 +177,8 @@ public class ItemAttributeHandler {
     }
 
     public @Nullable ItemType getPotentialType() {
-        try {
-            return ItemType.valueOf(((ItemAttributeType) item.getAttribute("item_type")).getValue());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        String typeValue = ((ItemAttributeType) item.getAttribute("item_type")).getValue();
+        return ItemType.get(typeValue);
     }
 
     public Rarity getRarity() {

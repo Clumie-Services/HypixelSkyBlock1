@@ -89,11 +89,15 @@ public class SkyBlockIsland {
                 onlinePlayers = coop.getOnlineMembers();
             } else {
                 // Island ID will be the same as the profile ID if the island is not a coop
-                try {
-                    onlinePlayers = List.of(SkyBlockGenericLoader.getPlayerFromProfileUUID(islandID));
-                } catch (NullPointerException e) {
-                    // Player doesn't have their data loaded yet
-                    onlinePlayers = List.of();
+                SkyBlockPlayer player = SkyBlockGenericLoader.getPlayerFromProfileUUID(islandID);
+                if (player != null) {
+                    onlinePlayers = List.of(player);
+                } else {
+                    // Player's profile data may not be loaded yet, try to find by island reference
+                    onlinePlayers = SkyBlockGenericLoader.getLoadedPlayers().stream()
+                            .filter(p -> p.getSkyBlockIsland() != null && p.getSkyBlockIsland().getIslandID().equals(islandID))
+                            .map(p -> (SkyBlockPlayer) p)
+                            .toList();
                 }
             }
 
@@ -172,11 +176,45 @@ public class SkyBlockIsland {
         }
     }
 
-    private void save() {
-        new PolarLoader(world).saveInstance(islandInstance);
-        database.insertOrUpdate("data", new Binary(PolarWriter.write(world)));
-        database.insertOrUpdate("lastSaved", System.currentTimeMillis());
-        database.insertOrUpdate("version", islandVersion);
+    /**
+     * Saves the island world data to the database.
+     * This includes the world binary data, last saved timestamp, and version.
+     * Can be called manually to force a save (e.g., on player disconnect).
+     */
+    public void save() {
+        if (world == null || islandInstance == null) {
+            Logger.warn("Attempted to save island {} but world or instance is null", islandID);
+            return;
+        }
+
+        try {
+            // Save chunks to the PolarWorld
+            new PolarLoader(world).saveInstance(islandInstance);
+
+            // Serialize and store in database
+            byte[] worldData = PolarWriter.write(world);
+            database.insertOrUpdate("data", new Binary(worldData));
+            database.insertOrUpdate("lastSaved", System.currentTimeMillis());
+            database.insertOrUpdate("version", islandVersion);
+
+            Logger.debug("Successfully saved island {} ({} bytes)", islandID, worldData.length);
+        } catch (Exception e) {
+            Logger.error("Failed to save island {}: {}", islandID, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Saves the island if it has been created and has a valid world.
+     * This is a safe method to call that won't throw exceptions.
+     *
+     * @return true if the save was attempted, false if the island wasn't ready
+     */
+    public boolean saveIfCreated() {
+        if (!created || world == null || islandInstance == null) {
+            return false;
+        }
+        save();
+        return true;
     }
 
     public static boolean hasIsland(UUID islandID) {

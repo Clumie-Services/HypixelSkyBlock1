@@ -26,7 +26,7 @@ public interface LeaderboardTracked {
 
     /**
      * Get the leaderboard key for this datapoint.
-     * @return The leaderboard key (e.g., "bedwars:experience"), or null if not tracked
+     * @return The leaderboard key (e.g., "game:experience"), or null if not tracked
      */
     String getLeaderboardKey();
 

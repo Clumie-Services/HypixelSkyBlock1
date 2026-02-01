@@ -69,11 +69,13 @@ public class MeleeAttackWithinRegionGoal extends GoalSelector {
         this.stop = target == null;
 
         if (!stop) {
+            // Always look at target while chasing or attacking
+            if (lookAt) {
+                entityCreature.lookAt(target);
+            }
+
             // Attack the target entity
             if (entityCreature.getDistanceSquared(target) <= range * range) {
-                if (lookAt) {
-                    entityCreature.lookAt(target);
-                }
                 if (!Cooldown.hasCooldown(time, lastHit, delay) && !entityCreature.isDead()) {
                     entityCreature.attack(target, true);
                     this.lastHit = time;

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ActionNewZoneDisplay implements HypixelEventClass {
 
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void run(PlayerRegionChangeEvent event) {
         SkyBlockPlayer player = event.getPlayer();
 
@@ -165,7 +165,7 @@ public class ActionNewZoneDisplay implements HypixelEventClass {
     public void onNewZone(SkyBlockPlayer player, RegionType zone, String... features) {
         player.sendMessage("");
         player.sendMessage("§6§l NEW AREA DISCOVERED!");
-        player.sendMessage("§7  ⏣ " + zone.getColor() + zone.getName());
+        player.sendMessage(" §7⏣ " + zone.getColor() + zone.getName());
         player.sendMessage("");
         if (features.length > 0) {
             for (String feature : features) {

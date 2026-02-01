@@ -21,15 +21,17 @@ public class ActionItemPlace implements HypixelEventClass {
         SkyBlockItem item = new SkyBlockItem(itemStack);
         SkyBlockPlayer player = (SkyBlockPlayer) event.getPlayer();
 
+        // Cancel by default - only allow if item has explicit placement component
+        event.setCancelled(true);
+
         if (item.hasComponent(PlaceEventComponent.class)) {
             PlaceEventComponent placeEvent = item.getComponent(PlaceEventComponent.class);
             placeEvent.handlePlace(event, player, item);
             return;
         }
 
-        if (!item.hasComponent(PlaceableComponent.class)) {
-            event.setCancelled(true);
-        } else {
+        if (item.hasComponent(PlaceableComponent.class)) {
+            event.setCancelled(false);
             PlaceableComponent placeableItem = item.getComponent(PlaceableComponent.class);
             if (placeableItem.getBlockType() != null) {
                 event.setBlock(new SkyBlockBlock(placeableItem.getBlockType()).toBlock());

@@ -1,7 +1,10 @@
 package net.swofty.type.skyblockgeneric.user;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.timer.Scheduler;
 import net.minestom.server.timer.TaskSchedule;
 import net.swofty.commons.ChatUtility;
@@ -17,6 +20,7 @@ public class StashReminder {
      * Sends clickable reminders every 60 seconds if players have items in their stash.
      */
     public static void start(Scheduler scheduler) {
+        // Stash reminder - every 60 seconds
         scheduler.submitTask(() -> {
             for (SkyBlockPlayer player : SkyBlockGenericLoader.getLoadedPlayers()) {
                 if (player.getSkyblockDataHandler() == null) continue;
@@ -35,6 +39,39 @@ public class StashReminder {
             }
             return TaskSchedule.tick(1200); // 60 seconds = 1200 ticks
         });
+
+        // Inventory full reminder - every 2 minutes
+        scheduler.submitTask(() -> {
+            for (SkyBlockPlayer player : SkyBlockGenericLoader.getLoadedPlayers()) {
+                if (player.getSkyblockDataHandler() == null) continue;
+
+                if (isInventoryFull(player)) {
+                    sendInventoryFullReminder(player);
+                }
+            }
+            return TaskSchedule.tick(2400); // 2 minutes = 2400 ticks
+        });
+    }
+
+    /**
+     * Check if the player's main inventory (slots 0-35) is full.
+     */
+    private static boolean isInventoryFull(SkyBlockPlayer player) {
+        for (int i = 0; i < 36; i++) {
+            ItemStack item = player.getInventory().getItemStack(i);
+            if (item.isAir()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Send inventory full reminder with chest open sound.
+     */
+    private static void sendInventoryFullReminder(SkyBlockPlayer player) {
+        player.sendMessage("§cInventory full? Don't forget to check out your Storage inside the SkyBlock Menu!");
+        player.playSound(Sound.sound(Key.key("block.chest.open"), Sound.Source.PLAYER, 1.0f, 2.0f));
     }
 
     private static void sendItemStashReminder(SkyBlockPlayer player, DatapointStash.PlayerStash stash) {
@@ -71,9 +108,9 @@ public class StashReminder {
 
         player.sendMessage("");
         List<String> lines = List.of(
-                "§7You have §b" + count + " " + materialWord + " §7stashed away!",
+                "§7You have §3" + count + " §7" + materialWord + " stashed away!",
                 "§8(This totals " + types + " " + typeWord + " of materials stashed!)",
-                "§2>>> CLICK HERE §bto pick " + itWord + " up! §2<<<"
+                "§3§l>>> §3§lCLICK HERE§b to pick " + itWord + " up! §3§l<<<"
         );
         lines = ChatUtility.FontInfo.centerLines(lines);
         for (String line : lines) {

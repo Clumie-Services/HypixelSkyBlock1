@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Interface for game-specific data handlers (BedWars, SkyWars, etc.)
+ * Interface for game-specific data handlers.
  * These are account-wide handlers that can be selectively loaded by servers.
  *
  * To add a new game data handler:

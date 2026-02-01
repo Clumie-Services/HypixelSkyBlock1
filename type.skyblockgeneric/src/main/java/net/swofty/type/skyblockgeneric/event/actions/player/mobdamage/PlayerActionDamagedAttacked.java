@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class PlayerActionDamagedAttacked implements HypixelEventClass {
 
-    @HypixelEvent(node = EventNodes.ENTITY, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.ENTITY, requireDataLoaded = true)
     public void run(EntityAttackEvent event) {
         if (!event.getTarget().getEntityType().equals(EntityType.PLAYER)) return;
 

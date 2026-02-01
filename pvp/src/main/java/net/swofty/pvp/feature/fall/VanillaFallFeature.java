@@ -101,6 +101,17 @@ public class VanillaFallFeature implements FallFeature, RegistrableFeature {
 			return;
 		}
 
+		// Check if entity landed in water - water negates fall damage
+		Instance instance = entity.getInstance();
+		if (instance != null) {
+			Block blockAtFeet = instance.getBlock(newPos);
+			Block blockBelow = instance.getBlock(newPos.add(0, -0.2, 0));
+			if (blockAtFeet.compare(Block.WATER) || blockBelow.compare(Block.WATER)) {
+				entity.setTag(FALL_DISTANCE, 0.0);
+				return;
+			}
+		}
+
 		Point landingPos = getLandingPos(entity, newPos);
 		Block block = entity.getInstance().getBlock(landingPos);
 

@@ -100,4 +100,19 @@ public class DialogueController {
             npc.dialogue().cancelDialogue(player);
         }
     }
+
+    /**
+     * Checks if the player is currently in a dialogue with ANY NPC.
+     *
+     * @param player The player to check.
+     * @return True if the player is in any dialogue, false otherwise.
+     */
+    public static boolean isInAnyDialogue(HypixelPlayer player) {
+        for (HypixelNPC npc : HypixelNPC.getRegisteredNPCs()) {
+            if (npc.dialogue().isInDialogue(player)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

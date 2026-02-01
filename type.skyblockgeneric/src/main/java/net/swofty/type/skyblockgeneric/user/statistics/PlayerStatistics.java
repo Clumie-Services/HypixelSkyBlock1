@@ -46,8 +46,10 @@ import net.swofty.type.skyblockgeneric.levels.unlocks.SkyBlockLevelStatisticUnlo
 import net.swofty.type.skyblockgeneric.mission.MissionData;
 import net.swofty.type.skyblockgeneric.mission.SkyBlockProgressMission;
 import net.swofty.type.skyblockgeneric.region.RegionType;
+import net.swofty.type.skyblockgeneric.region.SkyBlockRegion;
 import net.swofty.type.skyblockgeneric.user.SkyBlockActionBar;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
+import net.swofty.type.skyblockgeneric.utility.SoundSequences;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -479,6 +481,9 @@ public class PlayerStatistics {
                                 .clickEvent(ClickEvent.openUrl("https://wiki.hypixel.net/" + description.getWikiName()))
                         );
                         player.sendMessage("§a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+
+                        // Play the stat unlock sound sequence
+                        SoundSequences.playStatUnlockSound(player);
                     }
                 });
             });
@@ -562,47 +567,58 @@ public class PlayerStatistics {
         Scheduler scheduler = MinecraftServer.getSchedulerManager();
         scheduler.submitTask(() -> {
             SkyBlockGenericLoader.getLoadedPlayers().forEach(player -> {
-                if (player.getRegion() == null) return;
-                RegionType region = player.getRegion().getType();
-                List<MissionData.ActiveMission> activeMissions = player.getMissionData().getActiveMissions(region);
+                try {
+                    SkyBlockRegion playerRegion = player.getRegion();
+                    List<MissionData.ActiveMission> activeMissions;
 
-                if (activeMissions.isEmpty()) {
+                    if (playerRegion == null) {
+                        // When not in a region, get all active missions instead of filtering by region
+                        activeMissions = player.getMissionData().getActiveMissions();
+                    } else {
+                        RegionType region = playerRegion.getType();
+                        activeMissions = player.getMissionData().getActiveMissions(region);
+                    }
+
+                    if (activeMissions.isEmpty()) {
+                        if (barCache.containsKey(player)) {
+                            BossBar oldBar = barCache.get(player);
+                            player.hideBossBar(oldBar);
+                            barCache.remove(player);
+                        }
+                        return;
+                    }
+                    MissionData.ActiveMission activeMission = activeMissions.getFirst();
+                    BossBar bar;
+
+                    if (activeMission.isProgress()) {
+                        int maxProgress = ((SkyBlockProgressMission) MissionData.getMissionClass(activeMission)).getMaxProgress();
+                        float progress = (float) activeMission.getMissionProgress() / maxProgress;
+
+                        bar = BossBar.bossBar(
+                                Component.text(
+                                        "Objective: §e" + MissionData.getMissionClass(activeMission).getName()
+                                                + "  §7(§e" + activeMission.getMissionProgress() + "§7/§a" + maxProgress + "§7)"),
+                                progress,
+                                BossBar.Color.YELLOW,
+                                BossBar.Overlay.PROGRESS);
+                    } else {
+                        bar = BossBar.bossBar(
+                                Component.text("Objective: §e" + MissionData.getMissionClass(activeMission).getName()),
+                                1f,
+                                BossBar.Color.YELLOW,
+                                BossBar.Overlay.NOTCHED_6);
+                    }
+
                     if (barCache.containsKey(player)) {
                         BossBar oldBar = barCache.get(player);
                         player.hideBossBar(oldBar);
-                        barCache.remove(player);
                     }
-                    return;
+                    player.showBossBar(bar);
+                    barCache.put(player, bar);
+                } catch (Exception e) {
+                    // Log but don't crash the mission loop
+                    org.tinylog.Logger.warn("Failed to update mission bossbar for player: " + player.getUsername());
                 }
-                MissionData.ActiveMission activeMission = activeMissions.getFirst();
-                BossBar bar;
-
-                if (activeMission.isProgress()) {
-                    int maxProgress = ((SkyBlockProgressMission) MissionData.getMissionClass(activeMission)).getMaxProgress();
-                    float progress = (float) activeMission.getMissionProgress() / maxProgress;
-
-                    bar = BossBar.bossBar(
-                            Component.text(
-                                    "Objective: §e" + MissionData.getMissionClass(activeMission).getName()
-                                            + "  §7(§e" + activeMission.getMissionProgress() + "§7/§a" + maxProgress + "§7)"),
-                            progress,
-                            BossBar.Color.YELLOW,
-                            BossBar.Overlay.PROGRESS);
-                } else {
-                    bar = BossBar.bossBar(
-                            Component.text("Objective: §e" + MissionData.getMissionClass(activeMission).getName()),
-                            1f,
-                            BossBar.Color.YELLOW,
-                            BossBar.Overlay.NOTCHED_6);
-                }
-
-                if (barCache.containsKey(player)) {
-                    BossBar oldBar = barCache.get(player);
-                    if (oldBar.equals(bar)) return;
-                    player.hideBossBar(oldBar);
-                }
-                player.showBossBar(bar);
-                barCache.put(player, bar);
             });
             return TaskSchedule.tick(30);
         }, ExecutionType.TICK_END);

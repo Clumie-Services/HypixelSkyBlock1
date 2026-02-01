@@ -1,13 +1,15 @@
 package net.swofty.type.hub.npcs;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.swofty.type.generic.user.HypixelPlayer;
 import net.swofty.type.generic.entity.npc.HypixelNPC;
 import net.swofty.type.generic.entity.npc.configuration.HumanConfiguration;
-
 import net.swofty.type.generic.event.custom.NPCInteractEvent;
+import net.swofty.type.hub.gui.GUIOzanne;
+import net.swofty.type.skyblockgeneric.collection.CustomCollectionAward;
+import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 
 public class NPCOzanne extends HypixelNPC {
 
@@ -42,8 +44,22 @@ public class NPCOzanne extends HypixelNPC {
 
     @Override
     public void onClick(NPCInteractEvent e) {
-        e.player().sendMessage(Component.text("§cThis Feature is not there yet. §aOpen a Pull request HERE to get it added quickly!")
-                        .clickEvent(ClickEvent.openUrl("https://github.com/Swofty-Developments/HypixelSkyBlock")));
+        SkyBlockPlayer player = (SkyBlockPlayer) e.player();
+
+        player.playSound(Sound.sound(Key.key("entity.villager.yes"), Sound.Source.PLAYER, 1.0f, 2.0f));
+
+        if (!player.hasCustomCollectionAward(CustomCollectionAward.ACCESSORY_BAG)) {
+            player.sendMessage("§e[NPC] Ozanne§f: Hey!");
+            player.sendMessage("§e[NPC] Ozanne§f: Unlock the §aAccessory Bag §rfrom the §cRedstone §rcollection and then we can talk!");
+            return;
+        }
+
+        player.sendMessage("§e[NPC] Ozanne§f: Did you know that for the longest time...");
+        player.sendMessage("§e[NPC] Ozanne§f: The Blacksmith would reforge your §aaccessories§r?");
+        player.sendMessage("§e[NPC] Ozanne§f: §cCrazy §rstuff!");
+        player.sendMessage("§e[NPC] Ozanne§f: If you find §areforged accessories§r, I'll buy their reforges from you for §6coins§r!");
+
+        new GUIOzanne().open(player);
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class MissionBreakLog extends SkyBlockMission {
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void endMission(CustomBlockBreakEvent event) {
         if (event.getPlayerPlaced()) return;
 

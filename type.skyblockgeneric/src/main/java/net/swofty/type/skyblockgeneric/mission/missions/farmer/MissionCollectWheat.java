@@ -13,7 +13,7 @@ import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 import java.util.*;
 
 public class MissionCollectWheat extends SkyBlockProgressMission {
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onBlockBreak(CustomBlockBreakEvent event) {
         MissionData data = event.getPlayer().getMissionData();
 
@@ -23,8 +23,7 @@ public class MissionCollectWheat extends SkyBlockProgressMission {
 
         if (event.getMaterial().equals(Material.WHEAT)) {
             MissionData.ActiveMission mission = data.getMission(this.getClass()).getKey();
-            mission.setMissionProgress(mission.getMissionProgress() + 1);
-            mission.checkIfMissionEnded(event.getPlayer());
+            mission.addProgress(event.getPlayer());
         }
     }
 

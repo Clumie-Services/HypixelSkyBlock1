@@ -158,7 +158,7 @@ public final class SkyBlockCalendar {
         int currentTime = (int) ((elapsed % DAY) - 6000);
         if (currentTime < 0) currentTime += DAY;
         int hours = 6 + (currentTime / 1000);
-        int minutes = (currentTime % 1000) * 60 / 1000; // Corrected minutes calculation
+        int minutes = ((currentTime % 1000) * 60 / 1000) / 10 * 10; // Round to nearest 10 minutes
         String formattedMinutes = String.format("%02d", minutes);
         if (hours >= 24) hours -= 24;
         if (hours < 6 || hours >= 20) isDaytime = false;

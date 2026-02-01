@@ -19,5 +19,6 @@ public class PlaceEventComponent extends SkyBlockItemComponent {
         if (handler != null) {
             handler.onPlace(event, player, item);
         }
+        // Event stays cancelled (set by ActionItemPlace) unless handler explicitly un-cancels it
     }
 }

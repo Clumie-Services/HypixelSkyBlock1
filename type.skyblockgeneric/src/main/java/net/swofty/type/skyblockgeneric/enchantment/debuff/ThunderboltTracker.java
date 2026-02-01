@@ -20,8 +20,8 @@ public class ThunderboltTracker {
 
     private static final int HITS_PER_LIGHTNING = 3;
 
-    // Map<playerId, Map<mobId, hitCount>> - tracks hits per mob per player
-    private static final Map<UUID, Map<UUID, Integer>> playerMobHitCounters = new ConcurrentHashMap<>();
+    // Map<LightningType, Map<playerId, Map<mobId, hitCount>>> - tracks hits per mob per player per enchantment type
+    private static final Map<LightningType, Map<UUID, Map<UUID, Integer>>> typePlayerMobHitCounters = new ConcurrentHashMap<>();
 
     public enum LightningType {
         THUNDERBOLT,
@@ -35,8 +35,9 @@ public class ThunderboltTracker {
         UUID playerId = player.getUuid();
         UUID mobId = target.getUuid();
 
-        // Get or create the player's mob hit counter map
-        Map<UUID, Integer> mobCounters = playerMobHitCounters.computeIfAbsent(playerId, k -> new ConcurrentHashMap<>());
+        // Get or create the type-specific player's mob hit counter map
+        Map<UUID, Map<UUID, Integer>> playerMobCounters = typePlayerMobHitCounters.computeIfAbsent(type, k -> new ConcurrentHashMap<>());
+        Map<UUID, Integer> mobCounters = playerMobCounters.computeIfAbsent(playerId, k -> new ConcurrentHashMap<>());
 
         // Increment hit counter for this specific mob
         int currentHits = mobCounters.getOrDefault(mobId, 0);
@@ -59,25 +60,44 @@ public class ThunderboltTracker {
 
         if (lightningDamage <= 0) return;
 
-        originalTarget.damage(new Damage(DamageType.PLAYER_ATTACK, player, player, player.getPosition(), (float) lightningDamage));
+        // Thunderbolt hits enemies within 2 blocks, Thunderlord only hits the target
+        if (type == LightningType.THUNDERBOLT) {
+            // AOE damage to nearby mobs
+            originalTarget.getInstance().getNearbyEntities(originalTarget.getPosition(), 2).stream()
+                    .filter(e -> e instanceof SkyBlockMob && e != player)
+                    .map(e -> (SkyBlockMob) e)
+                    .forEach(mob -> {
+                        mob.damage(new Damage(DamageType.PLAYER_ATTACK, player, player, player.getPosition(), (float) lightningDamage));
+                        new DamageIndicator()
+                                .damage((float) lightningDamage)
+                                .pos(mob.getPosition())
+                                .critical(false)
+                                .display(mob.getInstance());
+                    });
+        } else {
+            // Single target damage
+            originalTarget.damage(new Damage(DamageType.PLAYER_ATTACK, player, player, player.getPosition(), (float) lightningDamage));
+            new DamageIndicator()
+                    .damage((float) lightningDamage)
+                    .pos(originalTarget.getPosition())
+                    .critical(false)
+                    .display(originalTarget.getInstance());
+        }
 
-        new DamageIndicator()
-                .damage((float) lightningDamage)
-                .pos(originalTarget.getPosition())
-                .critical(false)
-                .display(originalTarget.getInstance());
-
-        LivingEntity lightningBolt = new LivingEntity(EntityType.LIGHTNING_BOLT);
+        // Visual lightning effect only (no damage from the entity itself)
+        net.minestom.server.entity.Entity lightningBolt = new net.minestom.server.entity.Entity(EntityType.LIGHTNING_BOLT);
         lightningBolt.setInstance(originalTarget.getInstance(), originalTarget.getPosition());
-        lightningBolt.scheduleRemove(java.time.Duration.ofSeconds(1));
+        lightningBolt.scheduleRemove(java.time.Duration.ofMillis(500));
     }
 
     /**
      * Cleans up hit counters for a specific mob (call when mob dies or is removed)
      */
     public static void cleanupMobCounters(UUID mobId) {
-        for (Map<UUID, Integer> mobCounters : playerMobHitCounters.values()) {
-            mobCounters.remove(mobId);
+        for (Map<UUID, Map<UUID, Integer>> playerMobCounters : typePlayerMobHitCounters.values()) {
+            for (Map<UUID, Integer> mobCounters : playerMobCounters.values()) {
+                mobCounters.remove(mobId);
+            }
         }
     }
 

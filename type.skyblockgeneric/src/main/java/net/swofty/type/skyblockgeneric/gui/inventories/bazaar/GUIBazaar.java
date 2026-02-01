@@ -62,6 +62,22 @@ public class GUIBazaar extends HypixelInventoryGUI implements RefreshingGUI {
                         "§eClick to open");
             }
         });
+
+        set(new GUIClickableItem(51) {
+            @Override
+            public void run(InventoryPreClickEvent e, HypixelPlayer p) {
+                new GUIBazaarSettings().open(p);
+            }
+
+            @Override
+            public ItemStack.Builder getItem(HypixelPlayer p) {
+                return ItemStackCreator.getStack("§aBazaar Settings",
+                        Material.REDSTONE_TORCH, 1,
+                        "§7View and edit your Bazaar settings.",
+                        " ",
+                        "§eClick to open!");
+            }
+        });
     }
 
     @Override

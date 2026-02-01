@@ -29,7 +29,9 @@ public class EnchantmentSharpness implements Ench, EnchFromTable {
                 2, 14,
                 3, 18,
                 4, 23,
-                5, 27
+                5, 27,
+                6, 55,
+                7, 179
         ));
 
         if (player.hasCustomCollectionAward(CustomCollectionAward.SHARPNESS_DISCOUNT)) {
@@ -57,7 +59,9 @@ public class EnchantmentSharpness implements Ench, EnchFromTable {
                 2, 15,
                 3, 20,
                 4, 25,
-                5, 30
+                5, 30,
+                6, 50,
+                7, 100
         ));
 
         if (player.hasCustomCollectionAward(CustomCollectionAward.SHARPNESS_DISCOUNT)) {

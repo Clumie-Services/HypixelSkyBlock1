@@ -1,7 +1,6 @@
 package net.swofty.service.orchestrator;
 
 import net.swofty.commons.ServerType;
-import net.swofty.commons.bedwars.BedwarsGameType;
 import net.swofty.commons.game.Game;
 
 import java.time.Instant;
@@ -40,21 +39,7 @@ public class OrchestratorCache {
 	}
 
 	/**
-	 * Finds an existing joinable game for the specified game type and map (Bedwars-specific)
-	 */
-	public static GameWithServer findExisting(BedwarsGameType gameType, String map) {
-		return findExisting(ServerType.BEDWARS_GAME, gameType.maxPlayers(), map, 1);
-	}
-
-	/**
-	 * Finds an existing joinable game for the specified game type and map with needed slots (Bedwars-specific)
-	 */
-	public static GameWithServer findExisting(BedwarsGameType gameType, String map, int neededSlots) {
-		return findExisting(ServerType.BEDWARS_GAME, gameType.maxPlayers(), map, neededSlots);
-	}
-
-	/**
-	 * Generic version - finds an existing joinable game for any server type
+	 * Finds an existing joinable game for any server type
 	 */
 	public static GameWithServer findExisting(ServerType serverType, int maxPlayers, String map) {
 		return findExisting(serverType, maxPlayers, map, 1);
@@ -95,14 +80,7 @@ public class OrchestratorCache {
 	}
 
 	/**
-	 * Finds a server with capacity to host a new game (Bedwars-specific)
-	 */
-	public static GameServerState instantiateServer(BedwarsGameType gameType, String map) {
-		return instantiateServer(ServerType.BEDWARS_GAME, gameType.maxPlayers());
-	}
-
-	/**
-	 * Generic version - finds a server with capacity to host a new game for any server type
+	 * Finds a server with capacity to host a new game for any server type
 	 */
 	public static GameServerState instantiateServer(ServerType serverType, int maxPlayers) {
 		cleanup();
@@ -223,7 +201,7 @@ public class OrchestratorCache {
 
 	/**
 	 * Get player and game counts filtered by server type and optionally by game type name.
-	 * @param type The server type (e.g., MURDER_MYSTERY_GAME, BEDWARS_GAME)
+	 * @param type The server type
 	 * @param gameTypeName Optional game type name to filter by (e.g., "CLASSIC", "SOLO"). Pass null for all.
 	 * @return GameCountStats with player count and game count
 	 */
@@ -233,7 +211,7 @@ public class OrchestratorCache {
 
 	/**
 	 * Get player and game counts filtered by server type, game type name, and map name.
-	 * @param type The server type (e.g., MURDER_MYSTERY_GAME, BEDWARS_GAME)
+	 * @param type The server type
 	 * @param gameTypeName Optional game type name to filter by (e.g., "CLASSIC", "SOLO"). Pass null for all.
 	 * @param mapName Optional map name to filter by. Pass null for all maps.
 	 * @return GameCountStats with player count and game count

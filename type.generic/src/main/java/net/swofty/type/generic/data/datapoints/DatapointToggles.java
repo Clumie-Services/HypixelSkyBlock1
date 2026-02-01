@@ -115,6 +115,7 @@ public class DatapointToggles extends Datapoint<DatapointToggles.Toggles> {
 			AUTO_ACCEPT_QUESTS(false),
             RUSTY_PURCHASE_CONFIRMATION(false),
             RUSTY_SORT_BY_RARITY(false),
+            BAZAAR_DIRECT_MODE(false),
             ;
 
             private final boolean defaultValue;

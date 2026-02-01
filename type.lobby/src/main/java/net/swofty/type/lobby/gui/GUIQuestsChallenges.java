@@ -271,26 +271,6 @@ public class GUIQuestsChallenges extends HypixelInventoryGUI {
             }
         });
 
-        set(new GUIClickableItem(24) {
-            @Override
-            public ItemStack.Builder getItem(HypixelPlayer player) {
-                return ItemStackCreator.getStack(
-                        "§aSkyWars Quests & Challenges",
-                        Material.ENDER_EYE,
-                        1,
-                        "§7View all available quests and challenges",
-                        "§7that you can complete by playing SkyWars.",
-                        "",
-                        "§eClick to view!"
-                );
-            }
-
-            @Override
-            public void run(InventoryPreClickEvent e, HypixelPlayer player) {
-                new GUIGameQuests(AchievementCategory.SKYWARS).open(player);
-            }
-        });
-
         set(new GUIClickableItem(25) {
             @Override
             public ItemStack.Builder getItem(HypixelPlayer player) {
@@ -351,47 +331,6 @@ public class GUIQuestsChallenges extends HypixelInventoryGUI {
             @Override
             public void run(InventoryPreClickEvent e, HypixelPlayer player) {
                 new GUIGameQuests(AchievementCategory.SPEED_UHC).open(player);
-            }
-        });
-
-        set(new GUIClickableItem(30) {
-            @Override
-            public ItemStack.Builder getItem(HypixelPlayer player) {
-                return ItemStackCreator.getStack(
-                        "§aBed Wars Quests & Challenges",
-                        Material.RED_BED,
-                        1,
-                        "§7View all available quests and challenges",
-                        "§7that you can complete by playing Bed Wars.",
-                        "",
-                        "§eClick to view!"
-                );
-            }
-
-            @Override
-            public void run(InventoryPreClickEvent e, HypixelPlayer player) {
-                new GUIGameQuests(AchievementCategory.BEDWARS).open(player);
-            }
-        });
-
-        set(new GUIClickableItem(31) {
-            @Override
-            public ItemStack.Builder getItem(HypixelPlayer player) {
-                return ItemStackCreator.getStack(
-                        "§aMurder Mystery Quests & Challenges",
-                        Material.BOW,
-                        1,
-                        "§7View all available quests and challenges",
-                        "§7that you can complete by playing Murder",
-                        "§7Mystery.",
-                        "",
-                        "§eClick to view!"
-                );
-            }
-
-            @Override
-            public void run(InventoryPreClickEvent e, HypixelPlayer player) {
-                new GUIGameQuests(AchievementCategory.MURDER_MYSTERY).open(player);
             }
         });
 

@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 @ChannelListener(channel = ToProxyChannels.PLAYER_HANDLER)
 public class ListenerPlayerHandler extends RedisListener {
-	private static final java.util.Map<java.util.UUID, org.json.JSONObject> bedwarsPreferences = new java.util.concurrent.ConcurrentHashMap<>();
-
 	@Override
 	public JSONObject receivedMessage(JSONObject message, UUID serverUUID) {
 		UUID uuid = UUID.fromString(message.getString("uuid"));

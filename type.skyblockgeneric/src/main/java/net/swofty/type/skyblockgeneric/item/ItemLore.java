@@ -20,6 +20,7 @@ import net.swofty.commons.skyblock.statistics.ItemStatistic;
 import net.swofty.commons.skyblock.statistics.ItemStatistics;
 import net.swofty.commons.skyblock.item.attribute.attributes.ItemAttributePotionData;
 import net.swofty.type.skyblockgeneric.collection.CollectionCategories;
+import net.swofty.type.skyblockgeneric.enchantment.SkyBlockEnchantment;
 import net.swofty.type.skyblockgeneric.gems.GemRarity;
 import net.swofty.type.skyblockgeneric.gems.Gemstone;
 import net.swofty.type.skyblockgeneric.item.components.*;
@@ -235,24 +236,48 @@ public class ItemLore {
 		if (item.hasComponent(EnchantableComponent.class)) {
 			EnchantableComponent enchantable = item.getComponent(EnchantableComponent.class);
 			if (enchantable.showEnchantLores()) {
-				long enchantmentCount = handler.getEnchantments().toList().size();
+				List<SkyBlockEnchantment> enchantments = handler.getEnchantments().toList();
+				// Sort: ultimates first, then normal enchants
+				enchantments = enchantments.stream()
+						.sorted((a, b) -> {
+							boolean aUltimate = a.type().isUltimate();
+							boolean bUltimate = b.type().isUltimate();
+							if (aUltimate && !bUltimate) return -1;
+							if (!aUltimate && bUltimate) return 1;
+							return 0;
+						})
+						.toList();
+				long enchantmentCount = enchantments.size();
 				if (enchantmentCount < 4) {
-					handler.getEnchantments().forEach((enchantment) -> {
-						addLoreLine("§9" + enchantment.type().getName() +
-								" " + StringUtility.getAsRomanNumeral(enchantment.level()));
+					for (SkyBlockEnchantment enchantment : enchantments) {
+						addLoreLine(enchantment.type().getFormattedName(enchantment.level()));
 						if (player != null)
 							StringUtility.splitByWordAndLength(
 									enchantment.type().getDescription(enchantment.level(), player),
 									34
 							).forEach(string -> addLoreLine("§7" + string));
-					});
+					}
 
 				} else {
-					String enchantmentNames = handler.getEnchantments().toList().stream().map(enchantment1 ->
-									"§9" + enchantment1.type().getName() + " " + StringUtility
-											.getAsRomanNumeral(enchantment1.level()))
-							.collect(Collectors.joining(", "));
-					StringUtility.splitByWordAndLength(enchantmentNames, 34).forEach(this::addLoreLine);
+					// Group enchantments, 3 per line
+					StringBuilder currentLine = new StringBuilder();
+					int count = 0;
+					for (SkyBlockEnchantment enchantment : enchantments) {
+						if (count > 0) {
+							currentLine.append("§9, ");
+						}
+						currentLine.append(enchantment.type().getFormattedName(enchantment.level()));
+						count++;
+						if (count >= 3) {
+							addLoreLine(currentLine.toString());
+							currentLine = new StringBuilder();
+							count = 0;
+						}
+					}
+					// Add remaining enchantments
+					if (count > 0) {
+						addLoreLine(currentLine.toString());
+					}
 				}
 
 				if (enchantmentCount != 0) addLoreLine(null);
@@ -397,6 +422,20 @@ public class ItemLore {
 		}
 		overallValue += hpbValue;
 
+		// Calculate enchantment stat bonuses
+		double enchantValue = 0;
+		if (item.hasComponent(EnchantableComponent.class)) {
+			List<SkyBlockEnchantment> enchantments = item.getAttributeHandler().getEnchantments().toList();
+			for (SkyBlockEnchantment enchantment : enchantments) {
+				ItemStatistics enchantStats = enchantment.type().getEnch().getStatistics(enchantment.level());
+				double statValue = enchantStats.getOverall(statistic);
+				if (statValue != 0) {
+					enchantValue += statValue;
+				}
+			}
+		}
+		overallValue += enchantValue;
+
 		if (overallValue == 0) return false;
 
 		String color = statistic.getLoreColor();
@@ -408,6 +447,8 @@ public class ItemLore {
 		if (hpbValue != 0) line += " §e(" + (Math.round(hpbValue) >= 1 ? "+" : "") + Math.round(hpbValue) + ")";
 		if (reforgeValue != 0)
 			line += " §9(" + (Math.round(reforgeValue) > 0 ? "+" : "") + Math.round(reforgeValue) + ")";
+		if (enchantValue != 0)
+			line += " §9(" + (Math.round(enchantValue) >= 1 ? "+" : "") + Math.round(enchantValue) + ")";
 		if (gemstoneValue != 0)
 			line += " §d(" + (Math.round(gemstoneValue) >= 1 ? "+" : "") + Math.round(gemstoneValue) + ")";
 

@@ -34,11 +34,40 @@ public class InteractableRegistry {
 
                     Point position = player.getTargetBlockPosition(5);
                     if (position == null) {
+                        player.sendMessage("§cWhy would you try :(");
+                        return;
+                    }
+
+                    // Check if position is in the void (too low)
+                    if (position.y() < 1) {
+                        player.sendMessage("§cWhy would you try :(");
                         return;
                     }
 
                     // Move up one block and center jerry
                     position = position.add(0.5, 1, 0.5);
+
+                    // Verify there are 2 blocks of air available for Jerry to stand
+                    Point finalPosition = position;
+                    if (!player.getInstance().getBlock(position).isAir() ||
+                            !player.getInstance().getBlock(position.add(0, 1, 0)).isAir()) {
+                        // Find a safe spot with 2 blocks of air by searching upward
+                        Point searchPos = position;
+                        boolean foundSafeSpot = false;
+                        for (int y = 0; y < 10; y++) {
+                            Point checkPos = searchPos.add(0, y, 0);
+                            if (player.getInstance().getBlock(checkPos).isAir() &&
+                                    player.getInstance().getBlock(checkPos.add(0, 1, 0)).isAir()) {
+                                finalPosition = checkPos;
+                                foundSafeSpot = true;
+                                break;
+                            }
+                        }
+                        if (!foundSafeSpot) {
+                            player.sendMessage("§cCouldn't find a safe spot for Jerry!");
+                            return;
+                        }
+                    }
 
                     SkyBlockIsland island = player.getSkyBlockIsland();
                     JerryInformation jerryInformation = island.getJerryInformation();
@@ -46,7 +75,7 @@ public class InteractableRegistry {
                     ServerHolograms.ExternalHologram hologram = jerryInformation.getHologram();
                     ServerHolograms.removeExternalHologram(hologram);
 
-                    jerryInformation.setJerryPosition(new Pos(position).withLookAt(player.getPosition()));
+                    jerryInformation.setJerryPosition(new Pos(finalPosition).withLookAt(player.getPosition()));
                     jerryInformation.getJerry().teleport(jerryInformation.getJerryPosition());
                     jerryInformation.getJerry().lookAt(player.getPosition().add(0, 1.4, 0));
 

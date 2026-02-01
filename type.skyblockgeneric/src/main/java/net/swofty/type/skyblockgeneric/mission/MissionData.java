@@ -3,10 +3,13 @@ package net.swofty.type.skyblockgeneric.mission;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.swofty.type.skyblockgeneric.calendar.SkyBlockCalendar;
 import net.swofty.type.skyblockgeneric.levels.SkyBlockLevelCause;
 import net.swofty.type.skyblockgeneric.region.RegionType;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
+import net.swofty.type.skyblockgeneric.user.SkyBlockScoreboard;
 import org.jetbrains.annotations.Nullable;
 import org.tinylog.Logger;
 
@@ -48,6 +51,14 @@ public class MissionData {
             SkyBlockMission skyBlockMission = getMissionFromCache(mission.getMissionID());
             return skyBlockMission.getValidRegions().contains(regionType);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Gets all active missions without filtering by region.
+     * Used when player is not in a defined region (e.g., Hub spawn area).
+     */
+    public List<ActiveMission> getActiveMissions() {
+        return new ArrayList<>(activeMissions);
     }
 
     public boolean isCurrentlyActive(String missionID) {
@@ -98,6 +109,9 @@ public class MissionData {
         activeMission.setMissionEnded((int) SkyBlockCalendar.getElapsed());
         activeMissions.remove(activeMission);
         completedMissions.add(activeMission);
+
+        // Clear scoreboard cache to force refresh
+        SkyBlockScoreboard.removeCache(getSkyBlockPlayer());
     }
 
     public void endMission(Class<? extends SkyBlockMission> skyBlockMission) {
@@ -203,6 +217,38 @@ public class MissionData {
             if (missionProgress >= mission.getMaxProgress()) {
                 player.getMissionData().endMission(missionID);
             }
+        }
+
+        /**
+         * Adds progress to the mission and plays the progress sound.
+         * Use this method during gameplay instead of setMissionProgress directly.
+         */
+        public void addProgress(SkyBlockPlayer player, int amount) {
+            this.missionProgress += amount;
+            // Play note pling sound with pitch 0.49
+            player.playSound(Sound.sound(Key.key("block.note_block.pling"), Sound.Source.PLAYER, 1.0f, 0.49f));
+            checkIfMissionEnded(player);
+        }
+
+        /**
+         * Adds 1 progress to the mission and plays the progress sound.
+         */
+        public void addProgress(SkyBlockPlayer player) {
+            addProgress(player, 1);
+        }
+
+        /**
+         * Sets the mission progress to an absolute value.
+         * Only plays the sound if progress actually increased.
+         * Use this for missions that track inventory counts.
+         */
+        public void setProgress(SkyBlockPlayer player, int newProgress) {
+            if (newProgress > this.missionProgress) {
+                // Play note pling sound with pitch 0.49 only when progress increases
+                player.playSound(Sound.sound(Key.key("block.note_block.pling"), Sound.Source.PLAYER, 1.0f, 0.49f));
+            }
+            this.missionProgress = newProgress;
+            checkIfMissionEnded(player);
         }
 
         public List<String> getObjectiveCompleteText(ArrayList<String> rewards) {

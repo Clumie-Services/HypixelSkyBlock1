@@ -537,6 +537,14 @@ public class SkyBlockPlayer extends HypixelPlayer {
         return getSkyblockDataHandler().get(SkyBlockDataHandler.Data.STASH, DatapointStash.class).getValue();
     }
 
+    public net.swofty.type.skyblockgeneric.chocolatefactory.ChocolateFactoryData getChocolateFactoryData() {
+        return getSkyblockDataHandler().get(SkyBlockDataHandler.Data.CHOCOLATE_FACTORY, DatapointChocolateFactory.class).getValue();
+    }
+
+    public net.swofty.type.skyblockgeneric.chocolatefactory.HoppityCollectionData getHoppityCollectionData() {
+        return getSkyblockDataHandler().get(SkyBlockDataHandler.Data.HOPPITY_COLLECTION, DatapointHoppityCollection.class).getValue();
+    }
+
     /**
      * Check if the inventory can fit the given item.
      * Takes into account both empty slots and existing stackable stacks.

@@ -18,16 +18,7 @@ public enum ServerType {
 	SKYBLOCK_GALATEA(true),
 	SKYBLOCK_BACKWATER_BAYOU(true),
 	SKYBLOCK_JERRYS_WORKSHOP(true),
-	PROTOTYPE_LOBBY(false),
-	BEDWARS_LOBBY(false),
-	BEDWARS_GAME(false),
-	BEDWARS_CONFIGURATOR(false),
-	MURDER_MYSTERY_LOBBY(false),
-	MURDER_MYSTERY_GAME(false),
-	MURDER_MYSTERY_CONFIGURATOR(false),
-	SKYWARS_LOBBY(false),
-	SKYWARS_GAME(false),
-	SKYWARS_CONFIGURATOR(false)
+	PROTOTYPE_LOBBY(false)
 	;
 
 	private final boolean isSkyBlock;

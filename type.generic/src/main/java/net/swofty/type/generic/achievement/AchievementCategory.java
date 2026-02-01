@@ -6,9 +6,7 @@ import net.swofty.type.generic.gui.inventory.item.GUIMaterial;
 
 @Getter
 public enum AchievementCategory {
-    BEDWARS("Bed Wars", "bedwars", new GUIMaterial(Material.RED_BED)),
     VAMPIREZ("VampireZ", "vampirez", new GUIMaterial(Material.WITHER_SKELETON_SKULL)),
-    SKYWARS("SkyWars", "skywars", new GUIMaterial(Material.ENDER_EYE)),
     BLITZ_SG("Blitz SG", "blitzsg", new GUIMaterial(Material.DIAMOND_SWORD)),
     THE_WALLS("The Walls", "walls", new GUIMaterial(Material.SAND)),
     PAINTBALL("Paintball Warfare", "paintball", new GUIMaterial(Material.SNOWBALL)),
@@ -22,7 +20,6 @@ public enum AchievementCategory {
     TURBO_KART_RACERS("Turbo Kart Racers", "gingerbread", new GUIMaterial(Material.MINECART)),
     SMASH_HEROES("Smash Heroes", "supersmash", new GUIMaterial("d29a9f57267ed342a13e3ad3a240c4c5af5a1a36ab2de0d6c2a31af0e3cdde")),
     SPEED_UHC("Speed UHC", "speeduhc", new GUIMaterial(Material.GOLDEN_CARROT)),
-    MURDER_MYSTERY("Murder Mystery", "murdermystery", new GUIMaterial(Material.BOW)),
     BUILD_BATTLE("Build Battle", "buildbattle", new GUIMaterial(Material.CRAFTING_TABLE)),
     DUELS("Duels", "duels", new GUIMaterial(Material.FISHING_ROD)),
     PIT("Pit", "pit", new GUIMaterial(Material.DIRT)),

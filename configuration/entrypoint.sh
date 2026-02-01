@@ -3,20 +3,31 @@
 # Copy the Forwarding Secret
 cp configuration_files/forwarding.secret ./forwarding.secret
 
-# Copy the example config.yml if it doesn't exist
-if [ ! -f ./config.yml ]; then
-    cp configuration_files/config.example.yml ./config.yml
+# Ensure configuration directory exists
+mkdir -p ./configuration
+
+# If config.yml is missing in configuration folder, copy from example (which comes from host volume)
+if [ ! -f ./configuration/config.yml ]; then
+    echo "Copying config.example.yml to ./configuration/config.yml"
+    cp configuration_files/config.example.yml ./configuration/config.yml
 fi
 
 # Update config.yml with the forwarding secret (velocity-secret)
 secret=$(cat ./forwarding.secret)
-sed -i "s/velocity-secret: .*/velocity-secret: '$secret'/" ./config.yml
+echo "Injecting secret into ./configuration/config.yml"
+sed -i "s/velocity-secret: .*/velocity-secret: '$secret'/" ./configuration/config.yml
 
-# Replace the secret in settings.yml
-sed -i "s/secret: '.*'/secret: '$secret'/" ./settings.yml
+# For debugging: verify the file content
+echo "--- content of ./configuration/config.yml ---"
+cat ./configuration/config.yml
+echo "-------------------------------------------"
 
-# Set the settings.yml bind: ip: 'localhost' to bind: ip: '0.0.0.0'
-sed -i "s/ip: 'localhost'/ip: '0.0.0.0'/" ./settings.yml
+# Update settings.yml (NanoLimbo)
+if [ -f ./settings.yml ]; then
+    echo "Updating settings.yml"
+    sed -i "s/secret: '.*'/secret: '$secret'/" ./settings.yml
+    sed -i "s/ip: 'localhost'/ip: '0.0.0.0'/" ./settings.yml
+fi
 
-echo "$SERVICE_CMD"
+echo "Starting service: $SERVICE_CMD"
 exec $SERVICE_CMD

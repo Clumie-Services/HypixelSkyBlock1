@@ -1,7 +1,7 @@
 package net.swofty.type.hub.npcs;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.swofty.type.generic.user.HypixelPlayer;
 import net.swofty.type.generic.entity.npc.HypixelNPC;
@@ -42,8 +42,12 @@ public class NPCJacobus extends HypixelNPC {
 
     @Override
     public void onClick(NPCInteractEvent e) {
-        e.player().sendMessage(Component.text("§cThis Feature is not there yet. §aOpen a Pull request HERE to get it added quickly!")
-                        .clickEvent(ClickEvent.openUrl("https://github.com/Swofty-Developments/HypixelSkyBlock")));
+        HypixelPlayer player = e.player();
+
+        player.sendMessage("§e[NPC] Jacobus§f: Come back to see me once you have an §aAccessory Bag§r...");
+        player.sendMessage("§e[NPC] Jacobus§f: And some §6coins§r!");
+
+        player.playSound(Sound.sound(Key.key("entity.villager.yes"), Sound.Source.PLAYER, 1.0f, 0.70f));
     }
 
 }

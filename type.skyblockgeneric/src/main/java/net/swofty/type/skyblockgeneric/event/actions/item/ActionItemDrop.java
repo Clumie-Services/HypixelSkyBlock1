@@ -3,7 +3,10 @@ package net.swofty.type.skyblockgeneric.event.actions.item;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.item.ItemDropEvent;
+import net.minestom.server.item.ItemStack;
 import net.swofty.type.generic.data.datapoints.DatapointToggles;
+
+import java.util.concurrent.ThreadLocalRandom;
 import net.swofty.type.generic.event.EventNodes;
 import net.swofty.type.generic.event.HypixelEvent;
 import net.swofty.type.generic.event.HypixelEventClass;
@@ -16,15 +19,26 @@ public class ActionItemDrop implements HypixelEventClass {
     @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = true)
     public void run(ItemDropEvent event) {
         SkyBlockPlayer player = (SkyBlockPlayer) event.getPlayer();
+        ItemStack droppedStack = event.getItemStack();
 
-        if (new SkyBlockItem(event.getItemStack()).getAttributeHandler().getTypeAsString().toLowerCase().contains("menu")) {
-            event.setCancelled(true);
+        // Always cancel to handle drops ourselves
+        event.setCancelled(true);
+
+        if (new SkyBlockItem(droppedStack).getAttributeHandler().getTypeAsString().toLowerCase().contains("menu")) {
             return;
         }
 
         if (player.getOpenInventory() != null) {
-            event.setCancelled(true);
             return;
+        }
+
+        // Remove the dropped amount from the player's inventory
+        ItemStack currentItem = player.getInventory().getItemStack(player.getHeldSlot());
+        int remainingAmount = currentItem.amount() - droppedStack.amount();
+        if (remainingAmount <= 0) {
+            player.getInventory().setItemStack(player.getHeldSlot(), ItemStack.AIR);
+        } else {
+            player.getInventory().setItemStack(player.getHeldSlot(), currentItem.withAmount(remainingAmount));
         }
 
         boolean hideMessage = player.getToggles().get(DatapointToggles.Toggles.ToggleType.DISABLE_DROP_MESSAGES);
@@ -43,10 +57,11 @@ public class ActionItemDrop implements HypixelEventClass {
                     .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/toggledropalert")));
         }
 
-        DroppedItemEntityImpl droppedItem = new DroppedItemEntityImpl(new SkyBlockItem(
-                event.getItemStack()),
-                player);
-        Pos pos = Pos.fromPoint(player.getPosition().add(0, 1, 0));
+        DroppedItemEntityImpl droppedItem = new DroppedItemEntityImpl(new SkyBlockItem(droppedStack), player);
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
+        double rx = rand.nextDouble() * 0.5 - 0.25;
+        double rz = rand.nextDouble() * 0.5 - 0.25;
+        Pos pos = Pos.fromPoint(player.getPosition().add(rx, 1.3, rz));
 
         droppedItem.setVelocity(player.getPosition().direction()
                 .mul(5)

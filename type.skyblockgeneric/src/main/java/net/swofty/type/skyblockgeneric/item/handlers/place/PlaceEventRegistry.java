@@ -47,6 +47,8 @@ public class PlaceEventRegistry {
                     item.getAttributeHandler().isMithrilInfused());
             minionData.spawn(minion);
 
+            // Allow the placement but set to AIR since minion entity handles the visual
+            event.setCancelled(false);
             event.setBlock(Block.AIR);
 
             player.sendMessage(

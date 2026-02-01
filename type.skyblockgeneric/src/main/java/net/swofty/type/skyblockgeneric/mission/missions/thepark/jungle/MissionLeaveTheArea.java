@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class MissionLeaveTheArea extends SkyBlockMission {
 
-	@HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+	@HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
 	public void run(PlayerRegionChangeEvent event) {
 		if (event.getTo() == null) return;
 		MissionData data = event.getPlayer().getMissionData();

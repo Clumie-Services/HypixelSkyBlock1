@@ -1,12 +1,19 @@
 package net.swofty.type.hub.npcs;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
-import net.swofty.type.generic.user.HypixelPlayer;
 import net.swofty.type.generic.entity.npc.HypixelNPC;
+import net.swofty.type.generic.entity.npc.NPCOption;
 import net.swofty.type.generic.entity.npc.configuration.HumanConfiguration;
-import net.swofty.type.hub.gui.GUIMaxwell;
-
 import net.swofty.type.generic.event.custom.NPCInteractEvent;
+import net.swofty.type.generic.user.HypixelPlayer;
+import net.swofty.type.hub.gui.GUIMaxwell;
+import net.swofty.type.skyblockgeneric.collection.CustomCollectionAward;
+import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
+
+import java.util.List;
 
 public class NPCMaxwell extends HypixelNPC {
 
@@ -41,7 +48,103 @@ public class NPCMaxwell extends HypixelNPC {
 
     @Override
     public void onClick(NPCInteractEvent e) {
-        new GUIMaxwell().open(e.player());
+        SkyBlockPlayer player = (SkyBlockPlayer) e.player();
+        if (isInDialogue(player)) return;
+
+        if (!player.hasCustomCollectionAward(CustomCollectionAward.ACCESSORY_BAG)) {
+            setDialogue(player, "no-bag");
+            return;
+        }
+
+        setDialogue(player, "intro").thenRun(() -> {
+            NPCOption.sendOption(player, "maxwell", true, List.of(
+                    new NPCOption.Option(
+                            "ok_then_what",
+                            NamedTextColor.GREEN,
+                            false,
+                            "Ok, then what?",
+                            (p) -> {
+                                setDialogue(p, "magical-power").thenRun(() -> {
+                                    NPCOption.sendOption(p, "maxwell", true, List.of(
+                                            new NPCOption.Option(
+                                                    "magical_power",
+                                                    NamedTextColor.GREEN,
+                                                    false,
+                                                    "Magical power?",
+                                                    (p2) -> {
+                                                        setDialogue(p2, "stats").thenRun(() -> {
+                                                            NPCOption.sendOption(p2, "maxwell", true, List.of(
+                                                                    new NPCOption.Option(
+                                                                            "thats_amazing",
+                                                                            NamedTextColor.GREEN,
+                                                                            false,
+                                                                            "That's amazing!",
+                                                                            (p3) -> {
+                                                                                setDialogue(p3, "finale").thenRun(() -> {
+                                                                                    new GUIMaxwell().open(p3);
+                                                                                });
+                                                                            }
+                                                                    )
+                                                            ));
+                                                        });
+                                                    }
+                                            )
+                                    ));
+                                });
+                            }
+                    )
+            ));
+        });
     }
 
+    @Override
+    public DialogueSet[] dialogues(HypixelPlayer player) {
+        return new DialogueSet[] {
+                DialogueSet.builder()
+                        .key("no-bag")
+                        .lines(new String[]{
+                                "Accessories are §6§kX§6 magical §kX§f pieces of gear.",
+                                "To truly harness their power, you need an §aAccessory Bag§f!",
+                                "Unlock it from the §cRedstone §fcollection.",
+                                "We can talk after that!"
+                        })
+                        .sound(Sound.sound()
+                                .type(Key.key("entity.villager.yes"))
+                                .pitch(0.70f)
+                                .build())
+                        .build(),
+                DialogueSet.builder()
+                        .key("intro")
+                        .lines(new String[]{
+                                "Accessories are §6§kX§6 magical §kX§f pieces of gear.",
+                                "To truly harness their power, collect as many as possible and store them in your §aAccessory Bag§f!"
+                        })
+                        .sound(Sound.sound()
+                                .type(Key.key("entity.villager.yes"))
+                                .pitch(0.70f)
+                                .build())
+                        .build(),
+                DialogueSet.builder()
+                        .key("magical-power")
+                        .lines(new String[]{
+                                "On top of their existing abilities, each accessory makes your §aAccessory Bag §fmore powerful!",
+                                "Accessories add some §6§lMAGICAL POWER §fto the bag depending on their §drarity§f."
+                        })
+                        .build(),
+                DialogueSet.builder()
+                        .key("stats")
+                        .lines(new String[]{
+                                "Yes! The more §6Magical Power§f, the more stats like §c❤ Health §for §b✎ Intelligence §fyou get from your §aAccessory Bag§f."
+                        })
+                        .build(),
+                DialogueSet.builder()
+                        .key("finale")
+                        .lines(new String[]{
+                                "No, it's §6magic§f!",
+                                "Even better, YOU choose what stats you get!",
+                                "Check it out!"
+                        })
+                        .build()
+        };
+    }
 }

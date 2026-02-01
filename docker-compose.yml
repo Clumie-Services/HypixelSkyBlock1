@@ -132,38 +132,6 @@ services:
     networks:
       - hypixel_network
 
-  # bedwars_lobby:
-  #   image: game_server_prepared
-  #   container_name: bedwars_lobby
-  #   restart: "unless-stopped"
-  #   environment:
-  #     SERVICE_CMD: java -jar HypixelCore.jar BEDWARS_LOBBY
-  #   depends_on:
-  #     proxy:
-  #       condition: service_healthy
-  #     game_server_builder:
-  #       condition: service_started
-  #   volumes:
-  #     - ./configuration:/app/configuration_files
-  #   networks:
-  #     - hypixel_network
-  
-  # bedwars_game:
-  #   image: game_server_prepared
-  #   container_name: bedwars_game
-  #   restart: "unless-stopped"
-  #   environment:
-  #     SERVICE_CMD: java -jar HypixelCore.jar BEDWARS_GAME
-  #   depends_on:
-  #     proxy:
-  #       condition: service_healthy
-  #     game_server_builder:
-  #       condition: service_started
-  #   volumes:
-  #     - ./configuration:/app/configuration_files
-  #   networks:
-  #     - hypixel_network
-
   nanolimbo:
     image: game_server_prepared
     container_name: nanolimbo

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class MissionTalkToShepherd extends SkyBlockMission {
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onVillagerSpokenTo(NPCInteractEvent event) {
         MissionData data = ((SkyBlockPlayer) event.getPlayer()).getMissionData();
 

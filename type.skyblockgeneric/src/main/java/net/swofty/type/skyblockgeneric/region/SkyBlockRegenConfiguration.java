@@ -16,6 +16,8 @@ import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 
 import java.util.*;
 
+import static net.swofty.type.skyblockgeneric.region.UnsupportedBlockBreaker.breakUnsupportedBlocksAbove;
+
 public abstract class SkyBlockRegenConfiguration {
 
     public ArrayList<MiningTask> activeMiningTasks = new ArrayList<>();
@@ -66,6 +68,10 @@ public abstract class SkyBlockRegenConfiguration {
             task.setInitialReviveBlock(task.getReviveBlock());
             activeMiningTasks.add(task);
             instance.setBlock(block, task.getIntermediaryBlock());
+
+            // Break any blocks above that require support (grass, flowers, etc.)
+            // This mimics vanilla Minecraft behavior where plants break when their support is removed
+            breakUnsupportedBlocksAbove(instance, block);
         }
     }
 

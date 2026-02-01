@@ -49,8 +49,8 @@ public class MobZombie_01 extends BestiaryMob implements RegionPopulator {
                         1.6,
                         20,
                         TimeUnit.SERVER_TICK,
-                        RegionType.GRAVEYARD), // Attack the target
-                new RandomRegionStrollGoal(this, 15, RegionType.GRAVEYARD)  // Walk around
+                        RegionType.PRIVATE_ISLAND), // Attack the target
+                new RandomRegionStrollGoal(this, 15, RegionType.PRIVATE_ISLAND)  // Walk around
         );
     }
 

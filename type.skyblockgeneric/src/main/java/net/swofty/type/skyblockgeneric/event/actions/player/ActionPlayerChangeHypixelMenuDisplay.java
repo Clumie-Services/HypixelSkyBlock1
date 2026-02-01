@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ActionPlayerChangeHypixelMenuDisplay implements HypixelEventClass {
 
-    @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = true)
     public void run(PlayerChangeHeldSlotEvent event) {
         SkyBlockPlayer player = (SkyBlockPlayer) event.getPlayer();
         runCheck(player);

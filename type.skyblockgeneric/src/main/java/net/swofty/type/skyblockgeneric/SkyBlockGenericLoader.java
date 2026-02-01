@@ -9,6 +9,7 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
 import net.minestom.server.coordinate.CoordConversion;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.server.ServerTickMonitorEvent;
@@ -208,10 +209,6 @@ public record SkyBlockGenericLoader(HypixelTypeLoader typeLoader) {
             }
 
             final Component header = Component.text("§bYou are playing on §e§lMC.HYPIXEL.NET")
-                    .append(Component.newline())
-                    .append(Component.text("§7RAM USAGE: §8" + ramUsage + " MB"))
-                    .append(Component.newline())
-                    .append(Component.text("§7TPS: §8" + TPS))
                     .append(Component.newline());
 
             // Send per-player footer with their active effects
@@ -327,6 +324,13 @@ public record SkyBlockGenericLoader(HypixelTypeLoader typeLoader) {
         SkyBlockScoreboard.start();
         StashReminder.start(MinecraftServer.getSchedulerManager());
         PlayerHolograms.updateAll(MinecraftServer.getSchedulerManager());
+
+        /**
+         * Initialize Chocolate Factory
+         */
+        net.swofty.type.skyblockgeneric.chocolatefactory.rabbit.ChocolateRabbit.initialize(
+                java.nio.file.Path.of("./configuration/chocolatefactory/rabbits.json"));
+        net.swofty.type.skyblockgeneric.chocolatefactory.ChocolateProductionTask.startProductionLoop();
 
         /**
          * Register Bazaar propagator
@@ -543,18 +547,22 @@ public record SkyBlockGenericLoader(HypixelTypeLoader typeLoader) {
 
     public static List<SkyBlockPlayer> getLoadedPlayers() {
         List<SkyBlockPlayer> players = new ArrayList<>();
-        MinecraftServer.getConnectionManager().getOnlinePlayers()
-                .stream()
-                .filter(player -> {
-                    try {
-                        SkyBlockDataHandler.getUser(player.getUuid());
-                    } catch (Exception e) {
-                        return false;
-                    }
-                    return true;
-                })
-                .filter(player -> player.getInstance() != null)
-                .forEach(player -> players.add((SkyBlockPlayer) player));
+        Collection<Player> onlinePlayers = MinecraftServer.getConnectionManager().getOnlinePlayers();
+
+        for (Player player : onlinePlayers) {
+            // Check if SkyBlock data is loaded
+            if (!SkyBlockDataHandler.isDataLoaded(player.getUuid())) {
+                continue;
+            }
+
+            // Check if player has an instance
+            if (player.getInstance() == null) {
+                continue;
+            }
+
+            players.add((SkyBlockPlayer) player);
+        }
+
         return players;
     }
 
@@ -563,7 +571,15 @@ public record SkyBlockGenericLoader(HypixelTypeLoader typeLoader) {
     }
 
     public static @Nullable SkyBlockPlayer getPlayerFromProfileUUID(UUID uuid) {
-        return getLoadedPlayers().stream().filter(player -> player.getProfiles().getCurrentlySelected().equals(uuid)).findFirst().orElse(null);
+        return getLoadedPlayers().stream()
+                .filter(player -> {
+                    var profiles = player.getProfiles();
+                    if (profiles == null) return false;
+                    var selected = profiles.getCurrentlySelected();
+                    return selected != null && selected.equals(uuid);
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     public static <T> Stream<T> loopThroughPackage(String packageName, Class<T> clazz) {

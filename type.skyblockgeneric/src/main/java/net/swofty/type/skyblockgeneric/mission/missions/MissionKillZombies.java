@@ -14,7 +14,7 @@ import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 import java.util.*;
 
 public class MissionKillZombies extends SkyBlockProgressMission {
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onKilledZombie(PlayerKilledSkyBlockMobEvent event) {
         if (event.getKilledMob().getEntityType() != EntityType.ZOMBIE) return;
 
@@ -22,8 +22,7 @@ public class MissionKillZombies extends SkyBlockProgressMission {
         if (!data.isCurrentlyActive(MissionKillZombies.class) || data.hasCompleted(MissionKillZombies.class)) return;
 
         MissionData.ActiveMission mission = data.getMission(MissionKillZombies.class).getKey();
-        mission.setMissionProgress(mission.getMissionProgress() + 1);
-        mission.checkIfMissionEnded(event.getPlayer());
+        mission.addProgress(event.getPlayer());
     }
 
     @Override

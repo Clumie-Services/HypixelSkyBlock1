@@ -74,7 +74,7 @@ public class EnchantmentKnockback implements Ench, EnchFromTable, DamageEventEnc
         double knockbackX = Math.sin(yawRadians);
         double knockbackZ = -Math.cos(yawRadians);
 
-        float knockbackStrength = knockbackBlocks * 0.4f;
+        float knockbackStrength = knockbackBlocks * 0.1f;
 
         target.takeKnockback(knockbackStrength, knockbackX, knockbackZ);
     }

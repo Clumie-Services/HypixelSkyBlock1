@@ -192,10 +192,13 @@ public abstract class HypixelNPC {
 					if (isLookingNPC && entityDistance <= LOOK_DISTANCE) {
 						double diffX = playerPosition.x() - npcPosition.x();
 						double diffZ = playerPosition.z() - npcPosition.z();
+						double diffY = (playerPosition.y() + 1.62) - (npcPosition.y() + 1.62); // Eye height offset
 						double theta = Math.atan2(diffZ, diffX);
 						double yaw = MathUtility.normalizeAngle(Math.toDegrees(theta) + 90, 360.0);
+						double horizontalDistance = Math.sqrt(diffX * diffX + diffZ * diffZ);
+						double pitch = -Math.toDegrees(Math.atan2(diffY, horizontalDistance));
 						player.sendPackets(
-                                        new EntityRotationPacket(entity.getEntityId(), (float) yaw, npcPosition.pitch(), true),
+                                        new EntityRotationPacket(entity.getEntityId(), (float) yaw, (float) pitch, true),
                                         new EntityHeadLookPacket(entity.getEntityId(), (float) yaw)
 						);
 					} else if (isLookingNPC) {

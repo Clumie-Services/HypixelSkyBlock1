@@ -14,6 +14,7 @@ import net.swofty.type.generic.HypixelConst;
 import net.swofty.type.generic.SkyBlockTypeLoader;
 
 import net.swofty.type.generic.entity.npc.HypixelNPC;
+import net.swofty.type.generic.entity.npc.json.NPCJsonLoader;
 
 import net.swofty.type.generic.event.HypixelEventClass;
 import net.swofty.type.generic.tab.TablistManager;
@@ -99,10 +100,15 @@ public class TypeGoldMineLoader implements SkyBlockTypeLoader {
 
     @Override
     public List<HypixelNPC> getNPCs() {
-        return new ArrayList<>(SkyBlockGenericLoader.loopThroughPackage(
+        List<HypixelNPC> npcs = new ArrayList<>(SkyBlockGenericLoader.loopThroughPackage(
                 "net.swofty.type.goldmine.npcs",
                 HypixelNPC.class
         ).toList());
+
+        // Load NPCs from JSON configuration
+        npcs.addAll(NPCJsonLoader.loadFromFile("configuration/goldmine/npcs.json"));
+
+        return npcs;
     }
 
     @Override

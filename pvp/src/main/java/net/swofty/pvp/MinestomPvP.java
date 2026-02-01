@@ -82,7 +82,7 @@ public class MinestomPvP {
 
 		CombatPlayer.init(MinecraftServer.getGlobalEventHandler());
 
-		// You need to implement this yourself in a gamemode, look for an example in BedWarsPlayer - ArikSquad
+		// You need to implement this yourself in a gamemode - ArikSquad
 		/*if (player) {
 			MinecraftServer.getConnectionManager().setPlayerProvider(CombatPlayerImpl::new);
 		}*/

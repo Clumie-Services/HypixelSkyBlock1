@@ -1,0 +1,21 @@
+{
+  "minecraft:recipes/decorations/glow_item_frame": {
+    "criteria": {
+      "has_item_frame": "2026-01-30 21:06:52 -0300"
+    },
+    "done": true
+  },
+  "minecraft:recipes/decorations/crafting_table": {
+    "criteria": {
+      "unlock_right_away": "2026-01-30 21:06:39 -0300"
+    },
+    "done": true
+  },
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:plains": "2026-01-30 21:06:41 -0300"
+    },
+    "done": false
+  },
+  "DataVersion": 4671
+}

@@ -23,11 +23,11 @@ import net.swofty.type.generic.utility.MathUtility;
 import net.swofty.type.skyblockgeneric.SkyBlockGenericLoader;
 import net.swofty.type.skyblockgeneric.data.SkyBlockDataHandler;
 import net.swofty.type.skyblockgeneric.data.SkyBlockDatapoint;
-import net.swofty.type.skyblockgeneric.data.datapoints.DatapointUUID;
 import net.swofty.type.skyblockgeneric.data.monogdb.CoopDatabase;
 import net.swofty.type.skyblockgeneric.event.custom.PlayerRegionChangeEvent;
 import net.swofty.type.skyblockgeneric.region.SkyBlockRegion;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
+import net.swofty.type.skyblockgeneric.user.SkyBlockScoreboard;
 import net.swofty.type.skyblockgeneric.warps.TravelScrollIslands;
 import org.tinylog.Logger;
 
@@ -46,6 +46,13 @@ public class ActionPlayerDataLoaded implements HypixelEventClass {
         Logger.info("Loading SkyBlock data for spawned player: " + event.getPlayer().getUsername() + "...");
 
         UUID playerUuid = player.getUuid();
+
+        // Check if SkyBlock data is loaded before proceeding
+        if (!SkyBlockDataHandler.isDataLoaded(playerUuid)) {
+            Logger.warn("SkyBlock data not loaded for player: " + player.getUsername() + " - skipping data loaded event");
+            return;
+        }
+
         SkyBlockPlayerProfiles profiles = player.getProfiles();
         SkyBlockDataHandler handler = player.getSkyblockDataHandler();
         handler.runOnLoad(player);
@@ -80,6 +87,9 @@ public class ActionPlayerDataLoaded implements HypixelEventClass {
 
         player.sendMessage("");
 
+        // Initialize scoreboard immediately
+        SkyBlockScoreboard.updatePlayer(player);
+
         // Manually call region event with a delay
         MathUtility.delay(() -> {
             SkyBlockRegion playerRegion = player.getRegion();
@@ -108,11 +118,6 @@ public class ActionPlayerDataLoaded implements HypixelEventClass {
             player.sendMessage("§7 ");
             player.sendMessage("§aYou are playing on profile: §e" + player.getSkyblockDataHandler().get(
                     SkyBlockDataHandler.Data.PROFILE_NAME, DatapointString.class).getValue());
-            player.sendMessage("§8Profile ID: " + player.getProfiles().getCurrentlySelected());
-
-            UUID islandUuid = player.getSkyblockDataHandler().get(SkyBlockDataHandler.Data.ISLAND_UUID, DatapointUUID.class).getValue();
-            if (islandUuid != player.getProfiles().getCurrentlySelected())
-                player.sendMessage("§8Island ID: " + islandUuid);
             player.sendMessage(" ");
 
             player.health = player.getMaxHealth();

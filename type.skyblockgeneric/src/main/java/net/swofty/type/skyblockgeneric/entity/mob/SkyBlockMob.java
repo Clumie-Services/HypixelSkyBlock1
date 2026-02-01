@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Setter
 public abstract class SkyBlockMob extends EntityCreature {
@@ -73,7 +74,7 @@ public abstract class SkyBlockMob extends EntityCreature {
         this.getAttribute(Attribute.MAX_HEALTH)
                 .setBaseValue(getBaseStatistics().getOverall(ItemStatistic.HEALTH).floatValue());
         this.getAttribute(Attribute.MOVEMENT_SPEED)
-                .setBaseValue((float) ((getBaseStatistics().getOverall(ItemStatistic.SPEED).floatValue() / 1000) * 2.5));
+                .setBaseValue((float) (getBaseStatistics().getOverall(ItemStatistic.SPEED).floatValue() / 1000));
         this.setHealth(getBaseStatistics().getOverall(ItemStatistic.HEALTH).floatValue());
 
         this.customName = Component.text(
@@ -200,10 +201,25 @@ public abstract class SkyBlockMob extends EntityCreature {
     }
 
     @Override
+    public void remove() {
+        if (nameDisplayEntity != null) {
+            nameDisplayEntity.kill();
+            nameDisplayEntity.remove();
+            nameDisplayEntity = null;
+        }
+        mobs.remove(this);
+        super.remove();
+    }
+
+    @Override
     public void kill() {
         super.kill();
         mobs.remove(this);
-        nameDisplayEntity.kill();
+        if (nameDisplayEntity != null) {
+            nameDisplayEntity.kill();
+            nameDisplayEntity.remove();
+            nameDisplayEntity = null;
+        }
 
         if (!(getLastDamageSource().getAttacker() instanceof SkyBlockPlayer player)) return;
 
@@ -256,7 +272,10 @@ public abstract class SkyBlockMob extends EntityCreature {
                 player.addAndUpdateItem(item);
             } else {
                 DroppedItemEntityImpl droppedItem = new DroppedItemEntityImpl(item, player);
-                droppedItem.setInstance(getInstance(), getPosition().add(0, 0.5, 0));
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
+                double rx = rand.nextDouble() * 0.5 - 0.25;
+                double rz = rand.nextDouble() * 0.5 - 0.25;
+                droppedItem.setInstance(getInstance(), getPosition().add(rx, 0.5, rz));
             }
         }
     }

@@ -14,7 +14,6 @@ import net.minestom.server.world.biome.BiomeEffects;
 import net.swofty.commons.CustomWorlds;
 import net.swofty.commons.ServerType;
 import net.swofty.commons.ServiceType;
-import net.swofty.commons.bedwars.map.BedWarsMapsConfig;
 import net.swofty.proxyapi.redis.ProxyToClient;
 import net.swofty.proxyapi.redis.ServiceToClient;
 import net.swofty.type.dwarvenmines.gui.GUIGemstoneGrinder;
@@ -23,6 +22,7 @@ import net.swofty.type.generic.HypixelConst;
 import net.swofty.type.generic.SkyBlockTypeLoader;
 import net.swofty.type.generic.entity.InteractionEntity;
 import net.swofty.type.generic.entity.npc.HypixelNPC;
+import net.swofty.type.generic.entity.npc.json.NPCJsonLoader;
 import net.swofty.type.generic.event.HypixelEventClass;
 import net.swofty.type.generic.tab.TablistManager;
 import net.swofty.type.generic.tab.TablistModule;
@@ -100,10 +100,15 @@ public class TypeDwarvenMinesLoader implements SkyBlockTypeLoader {
 
     @Override
     public List<HypixelNPC> getNPCs() {
-        return new ArrayList<>(SkyBlockGenericLoader.loopThroughPackage(
+        List<HypixelNPC> npcs = new ArrayList<>(SkyBlockGenericLoader.loopThroughPackage(
                 "net.swofty.type.dwarvenmines.npcs",
                 HypixelNPC.class
         ).toList());
+
+        // Load NPCs from JSON configuration
+        npcs.addAll(NPCJsonLoader.loadFromFile("configuration/dwarvenmines/npcs.json"));
+
+        return npcs;
     }
 
     @Override

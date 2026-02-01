@@ -44,6 +44,40 @@ public enum EnchantmentType {
     VAMPIRISM(EnchantmentVampirism.class),
     VENOMOUS(EnchantmentVenomous.class),
     VICIOUS(EnchantmentVicious.class),
+
+    // Ultimate Enchantments
+    CHIMERA(EnchantmentChimera.class),
+    COMBO(EnchantmentCombo.class),
+    FATAL_TEMPO(EnchantmentFatalTempo.class),
+    INFERNO(EnchantmentInferno.class),
+    ONE_FOR_ALL(EnchantmentOneForAll.class),
+    SOUL_EATER(EnchantmentSoulEater.class),
+    SWARM(EnchantmentSwarm.class),
+    ULTIMATE_JERRY(EnchantmentUltimateJerry.class),
+    ULTIMATE_WISE(EnchantmentUltimateWise.class),
+
+    // Additional Sword Enchantments
+    CHAMPION(EnchantmentChampion.class),
+    DIVINE_GIFT(EnchantmentDivineGift.class),
+    DRAGON_HUNTER(EnchantmentDragonHunter.class),
+    SMOLDERING(EnchantmentSmoldering.class),
+    TABASCO(EnchantmentTabasco.class),
+    TITAN_KILLER(EnchantmentTitanKiller.class),
+    TRIPLE_STRIKE(EnchantmentTripleStrike.class),
+
+    // Bow Enchantments
+    CHANCE(EnchantmentChance.class),
+    DRAGON_TRACER(EnchantmentDragonTracer.class),
+    DUPLEX(EnchantmentDuplex.class),
+    FLAME(EnchantmentFlame.class),
+    INFINITE_QUIVER(EnchantmentInfiniteQuiver.class),
+    OVERLOAD(EnchantmentOverload.class),
+    PIERCING(EnchantmentPiercing.class),
+    POWER(EnchantmentPower.class),
+    PUNCH(EnchantmentPunch.class),
+    REND(EnchantmentRend.class),
+    SNIPE(EnchantmentSnipe.class),
+    TOXOPHILITE(EnchantmentToxophilite.class),
     ;
 
     private final Class<? extends Ench> clazz;
@@ -78,5 +112,21 @@ public enum EnchantmentType {
 
     public String getName() {
         return StringUtility.toNormalCase(this.name());
+    }
+
+    public boolean isUltimate() {
+        return this == CHIMERA || this == COMBO || this == FATAL_TEMPO ||
+               this == INFERNO || this == ONE_FOR_ALL || this == SOUL_EATER ||
+               this == SWARM || this == ULTIMATE_JERRY || this == ULTIMATE_WISE ||
+               this == DUPLEX || this == REND;
+    }
+
+    public String getFormattedName(int level) {
+        String romanLevel = StringUtility.getAsRomanNumeral(level);
+        if (isUltimate()) {
+            return "§d§l" + getName() + " " + romanLevel;
+        } else {
+            return "§9" + getName() + " " + romanLevel;
+        }
     }
 }

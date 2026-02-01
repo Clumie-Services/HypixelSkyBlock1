@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y jq expect netcat-traditional && apt-get
 # Download Velocity proxy JAR
 ADD https://fill-data.papermc.io/v1/objects/ef1a852bfae7397e84907837925e7ad21c6312066290edaae401b77f6f423ac3/velocity-3.4.0-SNAPSHOT-558.jar velocity.jar
 
-# Download SkyBlockProxy.jar
-ADD https://github.com/Swofty-Developments/HypixelSkyBlock/releases/download/latest/SkyBlockProxy.jar plugins/SkyBlockProxy.jar
+# Copy SkyBlockProxy.jar from local Gradle build
+COPY velocity.extension/build/libs/SkyBlockProxy.jar plugins/SkyBlockProxy.jar
 
 # Copy configuration data
 COPY ./configuration /app/configuration_files

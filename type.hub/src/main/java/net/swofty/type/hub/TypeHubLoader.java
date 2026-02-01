@@ -19,6 +19,7 @@ import net.swofty.type.generic.HypixelConst;
 import net.swofty.type.generic.SkyBlockTypeLoader;
 
 import net.swofty.type.generic.entity.npc.HypixelNPC;
+import net.swofty.type.generic.entity.npc.json.NPCJsonLoader;
 
 import net.swofty.type.generic.event.HypixelEventClass;
 import net.swofty.type.generic.tab.TablistManager;
@@ -122,8 +123,8 @@ public class TypeHubLoader implements SkyBlockTypeLoader {
 		// Register callback to refresh Sirius NPC and Dark Auction display when state changes
 		DarkAuctionHandler.setOnStateChangeCallback(darkAuctionDisplay::update);
 
-        // Place forest trees
-        ForestTreePlacement.placeTrees(HypixelConst.getInstanceContainer());
+        // Place forest trees (temporarily disabled - chunk loading issue)
+        // ForestTreePlacement.placeTrees(HypixelConst.getInstanceContainer());
 
 		HubMap hubMap = new HubMap();
 		hubMap.placeItemFrames(HypixelConst.getInstanceContainer());
@@ -172,10 +173,15 @@ public class TypeHubLoader implements SkyBlockTypeLoader {
 
 	@Override
 	public List<HypixelNPC> getNPCs() {
-        return new ArrayList<>(SkyBlockGenericLoader.loopThroughPackage(
-                "net.swofty.type.hub.npcs",
-                HypixelNPC.class
-        ).toList());
+		List<HypixelNPC> npcs = new ArrayList<>(SkyBlockGenericLoader.loopThroughPackage(
+				"net.swofty.type.hub.npcs",
+				HypixelNPC.class
+		).toList());
+
+		// Load NPCs from JSON configuration
+		npcs.addAll(NPCJsonLoader.loadFromFile("configuration/hub/npcs.json"));
+
+		return npcs;
 	}
 
 	@Override

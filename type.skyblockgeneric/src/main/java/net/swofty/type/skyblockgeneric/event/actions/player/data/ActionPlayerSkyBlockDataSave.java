@@ -9,6 +9,7 @@ import net.swofty.type.generic.event.EventNodes;
 import net.swofty.type.generic.event.HypixelEvent;
 import net.swofty.type.generic.event.HypixelEventClass;
 import net.swofty.type.skyblockgeneric.data.SkyBlockDataHandler;
+import net.swofty.type.skyblockgeneric.user.SkyBlockIsland;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 import org.bson.Document;
 import org.tinylog.Logger;
@@ -42,6 +43,17 @@ public class ActionPlayerSkyBlockDataSave implements HypixelEventClass {
             ProfilesDatabase.collection.replaceOne(eq("_id", profileId.toString()), newDoc);
         } else {
             ProfilesDatabase.collection.insertOne(newDoc);
+        }
+
+        // Save island world data immediately on disconnect
+        // This ensures island changes are persisted even if the server crashes
+        // before the vacant check runs
+        SkyBlockIsland island = player.getSkyBlockIsland();
+        if (island != null) {
+            Logger.info("Saving island world data for: " + player.getUsername() + "...");
+            if (island.saveIfCreated()) {
+                Logger.info("Successfully saved island world for: " + player.getUsername());
+            }
         }
 
         // Evict from SkyBlock cache

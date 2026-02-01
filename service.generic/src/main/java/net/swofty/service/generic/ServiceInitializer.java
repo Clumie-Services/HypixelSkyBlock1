@@ -57,6 +57,19 @@ public class ServiceInitializer {
         });
 
         RedisAPI.getInstance().startListeners();
+
+        // Keep the JVM alive with a non-daemon thread so the process
+        // does not exit when main() returns (Redis listeners may run on daemon threads).
+        Thread keepAlive = new Thread(() -> {
+            try {
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }, "service-keep-alive");
+        keepAlive.setDaemon(false);
+        keepAlive.start();
+
         System.out.println("Service " + service.getType().name() + " initialized!");
     }
 }

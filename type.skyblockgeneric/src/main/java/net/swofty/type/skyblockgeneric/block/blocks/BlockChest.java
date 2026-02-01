@@ -82,6 +82,8 @@ public class BlockChest implements CustomSkyBlockBlock, BlockInteractable, Block
             items = new SingleChest(instance, position).getItems();
         }
 
-        items.forEach(player::addAndUpdateItem);
+        items.stream()
+                .filter(item -> !item.isAir())
+                .forEach(player::addAndUpdateItem);
     }
 }

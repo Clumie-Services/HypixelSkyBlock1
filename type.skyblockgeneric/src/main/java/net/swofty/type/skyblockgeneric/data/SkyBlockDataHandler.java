@@ -57,6 +57,10 @@ public class SkyBlockDataHandler extends DataHandler {
         try { return getUser(player.getUuid()); } catch (Exception e) { return null; }
     }
 
+    public static boolean isDataLoaded(UUID uuid) {
+        return skyBlockCache.containsKey(uuid);
+    }
+
     public static SkyBlockDataHandler createFromProfileOnly(Document profileDoc) {
         UUID owner = UUID.fromString(profileDoc.getString("_owner"));
         UUID profileId = UUID.fromString(profileDoc.getString("_id"));
@@ -457,6 +461,18 @@ public class SkyBlockDataHandler extends DataHandler {
 
         COLLECTED_MOB_TYPE_REWARDS("collected_mob_type_rewards", false, false, false,
                 DatapointCollectedMobTypeRewards.class, new DatapointCollectedMobTypeRewards("collected_mob_type_rewards")),
+
+        CHOCOLATE_FACTORY("chocolate_factory", false, false, false,
+                DatapointChocolateFactory.class, new DatapointChocolateFactory("chocolate_factory")),
+
+        HOPPITY_COLLECTION("hoppity_collection", false, false, false,
+                DatapointHoppityCollection.class, new DatapointHoppityCollection("hoppity_collection")),
+
+        BAZAAR_INSTASELL_IGNORE("bazaar_instasell_ignore", false, false, false,
+                DatapointStringList.class, new DatapointStringList("bazaar_instasell_ignore")),
+
+        TRADE_DATA("trade_data", false, false, false,
+                DatapointTradeData.class, new DatapointTradeData("trade_data")),
         ;
 
         @Getter private final String key;

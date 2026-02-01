@@ -33,7 +33,7 @@ public class PlayerActionDamageMob implements HypixelEventClass {
     private static final Random random = new Random();
     private static final Map<UUID, Long> COOLDOWN = new HashMap<>();
 
-    @HypixelEvent(node = EventNodes.ALL, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.ALL, requireDataLoaded = true)
     public void run(EntityAttackEvent event) {
         if (event.getTarget().getEntityType().equals(EntityType.PLAYER)) return;
         if (!event.getEntity().getEntityType().equals(EntityType.PLAYER)) return;

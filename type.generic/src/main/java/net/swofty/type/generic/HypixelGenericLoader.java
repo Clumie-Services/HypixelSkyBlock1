@@ -26,13 +26,9 @@ import net.swofty.type.generic.block.SignBlockHandler;
 import net.swofty.type.generic.command.HypixelCommand;
 import net.swofty.type.generic.data.GameDataHandlerRegistry;
 import net.swofty.type.generic.data.HypixelDataHandler;
-import net.swofty.type.generic.data.handlers.BedWarsDataHandler;
-import net.swofty.type.generic.data.handlers.MurderMysteryDataHandler;
 import net.swofty.type.generic.data.handlers.PrototypeLobbyDataHandler;
-import net.swofty.type.generic.data.handlers.SkywarsDataHandler;
 import net.swofty.type.generic.data.mongodb.AttributeDatabase;
 import net.swofty.type.generic.data.mongodb.AuthenticationDatabase;
-import net.swofty.type.generic.data.mongodb.BedWarsStatsDatabase;
 import net.swofty.type.generic.data.mongodb.ProfilesDatabase;
 import net.swofty.type.generic.data.mongodb.UserDatabase;
 
@@ -132,7 +128,7 @@ public record HypixelGenericLoader(HypixelTypeLoader loader) {
          * Start generic tablist
          * SkyBlock has its own format so let SkyBlockGenericLoader handle it
          */
-        if (!loader.getType().isSkyBlock() && !(loader.getType() == ServerType.BEDWARS_GAME)) {
+        if (!loader.getType().isSkyBlock()) {
             MinecraftServer.getGlobalEventHandler().addListener(ServerTickMonitorEvent.class, event ->
                     LAST_TICK.set(event.getTickMonitor()));
             BenchmarkManager benchmarkManager = MinecraftServer.getBenchmarkManager();
@@ -155,10 +151,6 @@ public record HypixelGenericLoader(HypixelTypeLoader loader) {
                 }
 
                 final Component header = Component.text("§bYou are playing on §e§lMC.HYPIXEL.NET")
-                        .append(Component.newline())
-                        .append(Component.text("§7RAM USAGE: §8" + ramUsage + " MB"))
-                        .append(Component.newline())
-                        .append(Component.text("§7TPS: §8" + TPS))
                         .append(Component.newline());
                 final Component footer = Component.newline()
                         .append(Component.text("§aRanks, Boosters & MORE! §c§lSTORE.HYPIXEL.NET"));
@@ -187,8 +179,6 @@ public record HypixelGenericLoader(HypixelTypeLoader loader) {
         ProfilesDatabase.connect(mongoClient);
         AttributeDatabase.connect(mongoClient);
         UserDatabase.connect(mongoClient);
-        BedWarsStatsDatabase.connect(mongoClient);
-
         // Initialize leaderboard service (uses Redis for O(log N) leaderboard operations)
         LeaderboardService.connect(ConfigProvider.settings().getRedisUri());
 
@@ -200,10 +190,7 @@ public record HypixelGenericLoader(HypixelTypeLoader loader) {
         AchievementStatisticsService.initialize();
 
         // Register game data handlers
-        GameDataHandlerRegistry.register(new BedWarsDataHandler());
         GameDataHandlerRegistry.register(new PrototypeLobbyDataHandler());
-        GameDataHandlerRegistry.register(new MurderMysteryDataHandler());
-        GameDataHandlerRegistry.register(new SkywarsDataHandler());
 
         // Register Block Handlers
         MinecraftServer.getBlockManager().registerHandler(PlayerHeadBlockHandler.KEY, PlayerHeadBlockHandler::new);

@@ -21,7 +21,7 @@ public class DatapointLeaderboardLong extends Datapoint<Long> implements Leaderb
      * Create a leaderboard-tracked Long datapoint.
      * @param key The datapoint key (for MongoDB storage)
      * @param value The default value
-     * @param leaderboardKey The leaderboard key (e.g., "bedwars:experience")
+     * @param leaderboardKey The leaderboard key (e.g., "game:experience")
      */
     public DatapointLeaderboardLong(String key, Long value, String leaderboardKey) {
         super(key, value, serializer);

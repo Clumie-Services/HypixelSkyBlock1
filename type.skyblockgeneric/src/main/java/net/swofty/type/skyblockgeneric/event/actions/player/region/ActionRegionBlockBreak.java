@@ -9,41 +9,57 @@ import net.minestom.server.tag.Tag;
 import net.swofty.commons.skyblock.item.ItemType;
 import net.swofty.type.generic.HypixelConst;
 import net.swofty.type.skyblockgeneric.entity.DroppedItemEntityImpl;
+
+import java.util.concurrent.ThreadLocalRandom;
 import net.swofty.type.generic.event.EventNodes;
 import net.swofty.type.generic.event.HypixelEvent;
 import net.swofty.type.generic.event.HypixelEventClass;
 import net.swofty.type.generic.event.HypixelEventHandler;
+import net.swofty.type.skyblockgeneric.event.actions.custom.collection.ActionCollectionAdd;
 import net.swofty.type.skyblockgeneric.event.custom.CustomBlockBreakEvent;
 import net.swofty.type.skyblockgeneric.item.SkyBlockItem;
 import net.swofty.type.skyblockgeneric.item.components.CustomDropComponent;
 import net.swofty.type.skyblockgeneric.region.RegionType;
 import net.swofty.type.skyblockgeneric.region.SkyBlockRegenConfiguration;
 import net.swofty.type.skyblockgeneric.region.SkyBlockRegion;
+import net.swofty.type.skyblockgeneric.region.UnsupportedBlockBreaker;
 import net.swofty.type.skyblockgeneric.region.mining.MineableBlock;
 import net.swofty.type.skyblockgeneric.region.mining.handler.SkyBlockMiningHandler;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
+import net.swofty.type.skyblockgeneric.block.SkyBlockBlock;
+import net.swofty.type.skyblockgeneric.block.impl.BlockBreakable;
 
 import java.util.List;
 
 public class ActionRegionBlockBreak implements HypixelEventClass {
 
-    @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = true)
     public void run(PlayerBlockBreakEvent event) {
         final SkyBlockPlayer player = (SkyBlockPlayer) event.getPlayer();
 
         // Skip if player has build bypass
         if (player.isBypassBuild()) return;
 
-        event.setCancelled(true);
-        SkyBlockRegion region = SkyBlockRegion.getRegionOfPosition(event.getBlockPosition());
-
         Block block = event.getBlock();
+
+        // Skip if block is a SkyBlockBlock with custom break handling (e.g., chests)
+        // These are handled by ActionBlockDestroy instead
+        if (SkyBlockBlock.isSkyBlockBlock(block)) {
+            SkyBlockBlock skyBlockBlock = new SkyBlockBlock(block);
+            if (skyBlockBlock.getGenericInstance() instanceof BlockBreakable) {
+                return;
+            }
+        }
+
+        SkyBlockRegion region = SkyBlockRegion.getRegionOfPosition(event.getBlockPosition());
         Material material = Material.fromKey(block.name());
         boolean shouldItemDrop = false;
 
         // Handle island server block breaks
         if (HypixelConst.isIslandServer()) {
-            event.getInstance().setBlock(event.getBlockPosition(), Block.AIR);
+            // Don't cancel - let the block break naturally, then handle unsupported blocks
+            // Break any blocks above that require support (grass, flowers, etc.)
+            UnsupportedBlockBreaker.breakUnsupportedBlocksAbove(event.getInstance(), event.getBlockPosition());
             shouldItemDrop = true;
         }
 
@@ -82,6 +98,10 @@ public class ActionRegionBlockBreak implements HypixelEventClass {
             if (mining != null && material != null) {
                 mining.addToQueue(player, event.getBlockPosition().asPos(), (SharedInstance) player.getInstance());
                 shouldItemDrop = true;
+            } else {
+                // No mining handler for this region, cancel the break
+                event.setCancelled(true);
+                return;
             }
         }
         // Cancel if not in a region at all
@@ -136,40 +156,25 @@ public class ActionRegionBlockBreak implements HypixelEventClass {
                 // Handle item distribution based on player conditions
                 if (player.canInsertItemIntoSacks(droppedItemType, dropAmount)) {
                     player.getSackItems().increase(droppedItemType, dropAmount);
+                    if (!playerPlaced && droppedItemType != null) {
+                        ActionCollectionAdd.processCollection(player, droppedItemType, dropAmount);
+                    }
                 } else if (player.getSkyBlockExperience().getLevel().asInt() >= 6) {
                     player.addAndUpdateItem(dropItem);
-                } else {
-                    // Determine nearest air block between ore and player
-                    Pos orePos = event.getBlockPosition().asPos();
-                    Pos playerPos = player.getPosition();
-
-                    Pos[] offsets = {
-                            new Pos(1, 0, 0), new Pos(-1, 0, 0),
-                            new Pos(0, 1, 0), new Pos(0, -1, 0),
-                            new Pos(0, 0, 1), new Pos(0, 0, -1)
-                    };
-
-                    Pos nearestAirBlock = null;
-                    double closestDistanceSquared = Double.MAX_VALUE;
-
-                    for (Pos offset : offsets) {
-                        Pos adjacentPos = orePos.add(offset);
-                        Block block2 = player.getInstance().getBlock(adjacentPos);
-
-                        if (block2.isAir()) {
-                            double distanceSquared = adjacentPos.distanceSquared(playerPos);
-                            if (distanceSquared < closestDistanceSquared) {
-                                closestDistanceSquared = distanceSquared;
-                                nearestAirBlock = adjacentPos;
-                            }
-                        }
+                    if (!playerPlaced && droppedItemType != null) {
+                        ActionCollectionAdd.processCollection(player, droppedItemType, dropAmount);
                     }
-
-                    // Use the nearest air block or fallback to default position
-                    Pos dropPos = (nearestAirBlock != null) ? nearestAirBlock.add(0.5, 0.5, 0.5) : orePos.add(0.5, 1.5, 0.5);
+                } else {
+                    // Drop item at the broken block position with random offset within the block
+                    Pos orePos = event.getBlockPosition().asPos();
+                    ThreadLocalRandom rand = ThreadLocalRandom.current();
+                    double rx = rand.nextDouble() * 0.5 + 0.25;
+                    double rz = rand.nextDouble() * 0.5 + 0.25;
+                    Pos dropPos = orePos.add(rx, 0.25, rz);
 
                     // Spawn the item
                     DroppedItemEntityImpl droppedItem = new DroppedItemEntityImpl(dropItem, player);
+                    droppedItem.setGiveCollection(!playerPlaced);
                     droppedItem.setInstance(player.getInstance(), dropPos);
                     droppedItem.addViewer(player);
                 }

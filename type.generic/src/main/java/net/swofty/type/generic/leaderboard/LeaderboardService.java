@@ -68,7 +68,7 @@ public class LeaderboardService {
 
     /**
      * Update a player's score on a leaderboard.
-     * @param leaderboardKey The leaderboard key (e.g., "bedwars:experience")
+     * @param leaderboardKey The leaderboard key (e.g., "game:experience")
      * @param playerUuid The player's UUID
      * @param score The player's score
      */

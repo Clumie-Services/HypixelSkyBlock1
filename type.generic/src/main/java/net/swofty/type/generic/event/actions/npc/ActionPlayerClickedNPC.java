@@ -3,6 +3,7 @@ package net.swofty.type.generic.event.actions.npc;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.event.player.PlayerEntityInteractEvent;
+import net.swofty.type.generic.entity.npc.DialogueController;
 import net.swofty.type.generic.entity.npc.HypixelNPC;
 import net.swofty.type.generic.entity.npc.impl.NPCAnimalEntityImpl;
 import net.swofty.type.generic.entity.npc.impl.NPCEntityImpl;
@@ -26,6 +27,9 @@ public class ActionPlayerClickedNPC implements HypixelEventClass {
 		Entity entity = event.getTarget();
 		HypixelNPC npc = HypixelNPC.getFromImpl(player, entity);
 		if (npc == null) return;
+
+		// Block interaction if player is already in a dialogue with any NPC
+		if (DialogueController.isInAnyDialogue(player)) return;
 
 		NPCInteractEvent clickEvent = new NPCInteractEvent(player, event.getHand(), npc);
 		HypixelEventHandler.callCustomEvent(clickEvent);

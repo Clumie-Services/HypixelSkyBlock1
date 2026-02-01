@@ -15,7 +15,7 @@ import java.util.*;
 
 public class MissionShearSheep extends SkyBlockProgressMission {
 
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onKilledSheep(PlayerKilledSkyBlockMobEvent event) {
         if (event.getKilledMob().getEntityType() != EntityType.SHEEP) return;
 
@@ -23,8 +23,7 @@ public class MissionShearSheep extends SkyBlockProgressMission {
         if (!data.isCurrentlyActive(this.getClass()) || data.hasCompleted(this.getClass())) return;
 
         MissionData.ActiveMission mission = data.getMission(this.getClass()).getKey();
-        mission.setMissionProgress(mission.getMissionProgress() + 1);
-        mission.checkIfMissionEnded(event.getPlayer());
+        mission.addProgress(event.getPlayer());
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.swofty.service.generic.redis.ServiceEndpoint;
 import java.util.List;
 
 public class ItemTrackerService implements SkyBlockService {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         SkyBlockService.init(new ItemTrackerService());
 
         TrackedItemsDatabase.connect(ConfigProvider.settings().getMongodb());

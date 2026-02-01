@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class PlayerActionArrowDamageMob implements HypixelEventClass {
 
-    @HypixelEvent(node = EventNodes.ALL, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.ALL, requireDataLoaded = true)
     public void run(ProjectileCollideWithEntityEvent event) {
         ArrowEntityImpl arrow;
         if (event.getEntity() instanceof ArrowEntityImpl arrowEntity)

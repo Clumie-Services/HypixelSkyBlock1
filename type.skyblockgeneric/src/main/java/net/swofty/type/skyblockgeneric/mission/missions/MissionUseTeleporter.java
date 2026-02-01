@@ -13,7 +13,7 @@ import java.util.*;
 
 public class MissionUseTeleporter extends SkyBlockMission {
 
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onRegionChange(PlayerRegionChangeEvent event) {
         if (event.getTo() == null || !event.getTo().equals(RegionType.VILLAGE)) {
             return;

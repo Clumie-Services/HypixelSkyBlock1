@@ -7,11 +7,12 @@ import net.swofty.type.generic.event.EventNodes;
 import net.swofty.type.generic.event.HypixelEvent;
 import net.swofty.type.generic.event.HypixelEventClass;
 import net.swofty.type.skyblockgeneric.entity.DroppedItemEntityImpl;
+import net.swofty.type.skyblockgeneric.event.actions.custom.collection.ActionCollectionAdd;
 import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 
 public class ActionPlayerItemPickup implements HypixelEventClass {
 
-    @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.PLAYER, requireDataLoaded = true)
     public void run(PlayerMoveEvent event) {
         final SkyBlockPlayer player = (SkyBlockPlayer) event.getPlayer();
 
@@ -31,6 +32,9 @@ public class ActionPlayerItemPickup implements HypixelEventClass {
                         player.getSackItems().increase(type, amount);
                     } else {
                         player.addAndUpdateItem(item.getItem());
+                    }
+                    if (item.isGiveCollection() && type != null) {
+                        ActionCollectionAdd.processCollection(player, type, amount);
                     }
                     item.remove();
                 }

@@ -13,7 +13,7 @@ import net.swofty.type.skyblockgeneric.user.SkyBlockPlayer;
 import java.util.*;
 
 public class MissionTalkToFarmHand extends SkyBlockMission {
-    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = false)
+    @HypixelEvent(node = EventNodes.CUSTOM, requireDataLoaded = true)
     public void onRegionChange(PlayerRegionChangeEvent event) {
         MissionData data = event.getPlayer().getMissionData();
 

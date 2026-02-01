@@ -100,6 +100,17 @@ public class GUISkyBlockLevels extends StatelessView {
                         "§eClick to view!"),
                 (click, c) -> c.player().openView(new GUILevelsGuide(LevelsGuide.STARTER)));
 
+        // Ways to Level Up
+        layout.slot(16, (s, c) -> ItemStackCreator.getStack("§aWays to Level Up", Material.REDSTONE_TORCH, 1,
+                        "§7Learn more about the different ways",
+                        "§7to earn SkyBlock XP.",
+                        " ",
+                        "§7Also see a specific breakdown of",
+                        "§7where all your XP comes from!",
+                        " ",
+                        "§eClick to view!"),
+                (click, c) -> c.player().openView(new GUILevelsGuide(LevelsGuide.STARTER)));
+
         // Prefix Emblems
         layout.slot(43, (s, c) -> ItemStackCreator.getStack("§aPrefix Emblems", Material.NAME_TAG, 1,
                         "§7Add some spice by having an emblem",
@@ -156,7 +167,7 @@ public class GUISkyBlockLevels extends StatelessView {
                 }
                 lore.add("§eClick to view rewards!");
 
-                return ItemStackCreator.getStack("§7Level " + level.asInt(), material, 1, lore);
+                return ItemStackCreator.getStack("§eLevel " + level.asInt(), material, 1, lore);
             }, (click, c) -> c.player().openView(new GUISkyBlockLevel(level)));
         }
 
@@ -176,7 +187,7 @@ public class GUISkyBlockLevels extends StatelessView {
                 lore.add(" ");
                 lore.add("§eClick to view rewards!");
 
-                return ItemStackCreator.getStack("§7Level " + currentMilestone.asInt(), Material.PURPLE_STAINED_GLASS_PANE, 1, lore);
+                return ItemStackCreator.getStack("§aLevel " + currentMilestone.asInt(), Material.LIME_DYE, 1, lore);
             }, (click, c) -> c.player().openView(new GUISkyBlockLevel(currentMilestone)));
         }
     }
